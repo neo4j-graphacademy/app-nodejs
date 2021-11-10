@@ -37,7 +37,9 @@ export default class AuthService {
    */
   // tag::register[]
   async register(email, plainPassword, name) {
-    const encrypted = await hash(plainPassword, parseInt(process.env.SALT_ROUNDS))
+    const encrypted = await hash(plainPassword,
+      parseInt(process.env.SALT_ROUNDS)
+    )
 
     // tag::constraintError[]
     // TODO: Handle Unique constraints in the database
@@ -50,7 +52,6 @@ export default class AuthService {
 
     // Open a new session
     const session = this.driver.session()
-
 
     // tag::create[]
     // Save user
