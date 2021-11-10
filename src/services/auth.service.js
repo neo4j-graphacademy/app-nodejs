@@ -41,42 +41,46 @@ export default class AuthService {
       parseInt(process.env.SALT_ROUNDS)
     )
 
-    // tag::constraintError[]
-    // TODO: Handle Unique constraints in the database
-    if (email !== 'graphacademy@neo4j.com') {
-      throw new ValidationError(`An account already exists with the email address ${email}`, {
-        email: 'Email address taken'
-      })
-    }
-    // end::constraintError[]
-
     // Open a new session
     const session = this.driver.session()
 
-    // tag::create[]
-    // Save user
-    const res = await session.writeTransaction(tx =>
-      tx.run(
-        `CREATE (u:User {
-          userId: randomUuid(),
-          email: $email,
-          password: $encrypted,
-          name: $name
-        })
-        RETURN u`,
-        { email, encrypted, name }
+    // tag::catch[]
+    try {
+      const res = await session.writeTransaction(tx =>
+        tx.run(
+          `CREATE (u:User {
+            userId: randomUuid(),
+            email: $email,
+            password: $encrypted,
+            name: $name
+          })
+          RETURN u`,
+          { email, encrypted, name }
+        )
       )
-    )
 
-    // Extract safe properties from the user node (`u`) in the first row
-    const node = res.records[0].get('u')
-    const { password, ...safeProperties } = node.properties
-    // end::create[]
+      const { password, ...safeProperties } = res.records[0].get('u').properties
 
-    return {
-      ...safeProperties,
-      token: jwt.sign(this.userToClaims(safeProperties), process.env.JWT_SECRET),
+      return {
+        ...safeProperties,
+        token: jwt.sign(this.userToClaims(safeProperties), process.env.JWT_SECRET),
+      }
     }
+    catch (e) {
+      // TODO: Handle Unique constraints in the database
+      if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
+        throw new ValidationError(`An account already exists with the email address ${email}`, {
+          email: 'Email address taken'
+        })
+      }
+
+      throw e
+    }
+    finally {
+      // Close the session
+      session.close()
+    }
+    // end::catch[]
   }
   // end::register[]
 
