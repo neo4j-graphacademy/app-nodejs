@@ -131,10 +131,10 @@ export default class AuthService {
     const correct = await compare(unencryptedPassword,
       encryptedPassword)
 
-      if ( correct === false ) {
-        return false
-      }
-      // end::password[]
+    if ( correct === false ) {
+      return false
+    }
+    // end::password[]
 
     // Close the session
     await session.close()
