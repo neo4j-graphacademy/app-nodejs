@@ -106,17 +106,48 @@ export default class AuthService {
    */
   // tag::authenticate[]
   async authenticate(email, unencryptedPassword) {
-    // TODO: Authenticate the user from the database
-    if (email === 'graphacademy@neo4j.com' && unencryptedPassword === 'letmein') {
-      const { password, ...claims } = user.properties
+    // Open a new session
+    const session = this.driver.session()
 
-      return {
-        ...claims,
-        token: jwt.sign(claims, process.env.JWT_SECRET)
-      }
+    // tag::query[]
+    // Find the User node within a Read Transaction
+    const res = await session.readTransaction(tx =>
+      tx.run('MATCH (u:User {email: $email}) RETURN u', { email })
+    )
+    // end::query[]
+
+    // tag::norecords[]
+    // User not found, return false
+    if ( res.records.length === 0 ) {
+      return false
     }
+    // end::norecords[]
 
-    return false
+    // tag::password[]
+    // Check password
+    const user = res.records[0].get('u')
+    const encryptedPassword = user.properties.password
+
+    const correct = await compare(unencryptedPassword,
+      encryptedPassword)
+
+      if ( correct === false ) {
+        return false
+      }
+      // end::password[]
+
+    // Close the session
+    await session.close()
+
+    // tag::return[]
+    // Extract the claims for the JWT
+    const { password, ...safeProperties } = user.properties
+
+    return {
+      ...safeProperties,
+      token: jwt.sign(this.userToClaims(safeProperties), process.env.JWT_SECRET),
+    }
+    // end::return[]
   }
   // end::authenticate[]
 
