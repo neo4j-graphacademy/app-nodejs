@@ -69,7 +69,8 @@ export default class AuthService {
     )
 
     // Extract safe properties from the user node (`u`) in the first row
-    const { password, ...safeProperties } = res.records[0].get('u').properties
+    const node = res.records[0].get('u')
+    const { password, ...safeProperties } = node.properties
     // end::create[]
 
     return {
