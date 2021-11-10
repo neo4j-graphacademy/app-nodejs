@@ -67,7 +67,7 @@ export default class AuthService {
       }
     }
     catch (e) {
-      // TODO: Handle Unique constraints in the database
+      // Handle unique constraints in the database
       if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
         throw new ValidationError(`An account already exists with the email address ${email}`, {
           email: 'Email address taken'
