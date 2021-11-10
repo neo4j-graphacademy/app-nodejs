@@ -1,0 +1,1 @@
+CREATE (:User {email: "uniqueconstraint@example.com"})
