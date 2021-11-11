@@ -32,14 +32,11 @@ describe('09. Browsing Genres', () => {
 
         output.sort((a, b) => a.movies > b.movies ? -1 : 1)
 
-        console.log(output[0]);
-        console.log(output[1]);
-
         console.log('\n\n')
         console.log('Here is the answer to the quiz question on the lesson:')
-        console.log('What is the title of the highest rated movie in the recommendations dataset?')
+        console.log('Which genre has the highest movie count?')
         console.log('Copy and paste the following answer into the text box: \n\n');
 
-        console.log(output[0].title)
+        console.log(output[0].name)
     })
 })
