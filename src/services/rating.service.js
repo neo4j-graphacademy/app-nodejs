@@ -91,6 +91,7 @@ export default class ReviewService {
     await session.close()
 
     // tag::addreturn[]
+    // Return movie details and a rating
     const [ first ] = res.records
     const movie = first.get('movie')
 
