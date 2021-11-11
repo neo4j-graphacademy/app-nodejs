@@ -1,5 +1,5 @@
-// Task: Add a favorite property to the movie output to
-// Outcome: Goodfellas should have a favorite property set to trye
+// Task: Add a favorite property to the movie output
+// Outcome: Goodfellas should have a favorite property set to true
 
 import { config } from 'dotenv'
 import { closeDriver, getDriver, initDriver } from '../../src/neo4j'
@@ -7,8 +7,6 @@ import FavoriteService from '../../src/services/favorite.service'
 import MovieService from '../../src/services/movie.service'
 
 describe('08. Favorites Flag', () => {
-    const toyStory = '862'
-    const freeWilly = '1634'
     const userId = 'fe770c6b-4034-4e07-8e40-2f39e7a6722c'
     const email = 'graphacademy.flag@neo4j.com'
 
@@ -34,29 +32,35 @@ describe('08. Favorites Flag', () => {
         await closeDriver()
     })
 
-    it('should return a positive favorite flag in call to `findById`', async () => {
+    it('should return a positive favorite on `all` call', async () => {
         const driver = getDriver()
-        const service = new FavoriteService(driver)
+        const movieService = new MovieService(driver)
+        const favoriteService = new FavoriteService(driver)
 
-        // Add Movie
-        const add = await service.add(userId, freeWilly)
+        // Get the most popular movie
+        const [ first ] = await movieService.all('imdbRating', 'DESC', 1, 0, userId)
 
-        expect(add.tmdbId).toEqual(freeWilly)
+        // Add Movie to Favorites
+        const add = await favoriteService.add(userId, first.tmdbId)
+
+        expect(add.tmdbId).toEqual(first.tmdbId)
         expect(add.favorite).toEqual(true)
 
-        // Add Check
-        const addCheck = await service.all(userId)
+        // Check this has been added to the favorites
+        const addCheck = await favoriteService.all(userId, 'imdbRating', 'ASC', 999, 0)
 
-        const found = addCheck.find(movie => movie.tmdbId === freeWilly)
+        const found = addCheck.find(movie => movie.tmdbId === first.tmdbId)
         expect(found).toBeDefined()
 
-        // Check individual movie
-        const movieService = new MovieService(driver)
 
-        const freeWillyOutput = await movieService.findById(freeWilly, userId)
-        expect(freeWillyOutput.favorite).toEqual(true)
+        // Check the flag MovieService has been correctly assigned
+        const [ checkFirst, checkSecond ] = await movieService.all('imdbRating', 'DESC', 2, 0, userId)
 
-        const toyStoryOutput = await movieService.findById(toyStory, userId)
-        expect(toyStoryOutput.favorite).toEqual(false)
+        // First should be true
+        expect(checkFirst.tmdbId).toEqual(add.tmdbId)
+        expect(checkFirst.favorite).toEqual(true)
+
+        // Second should be false
+        expect(checkSecond.favorite).toEqual(false)
     })
 })
