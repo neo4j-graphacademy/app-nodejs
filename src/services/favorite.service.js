@@ -149,5 +149,4 @@ export default class FavoriteService {
     return toNativeTypes(res.records[0].get('movie'))
   }
   // end::remove[]
-
 }
