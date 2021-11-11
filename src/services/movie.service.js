@@ -45,8 +45,11 @@ export default class MovieService {
     // tag::allcypher[]
     // Execute a query in a new Read Transaction
     const res = await session.readTransaction(async tx => {
+      // Get an array of IDs for the User's favorite movies
       const favorites = await this.getUserFavorites(tx, userId)
 
+      // Retrieve a list of movies with the
+      // favorite flag appened to the movie's properties
       return tx.run(`
         MATCH (m:Movie)
         WHERE exists(m.\`${sort}\`)
