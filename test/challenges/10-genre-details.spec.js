@@ -30,10 +30,9 @@ describe('10. Finding Genre Details', () => {
         expect(output).toBeDefined()
         expect(output.name).toEqual(name)
 
-
         console.log('\n\n')
         console.log('Here is the answer to the quiz question on the lesson:')
-        console.log('What is the title of the highest rated movie in the recommendations dataset?')
+        console.log('How many movies are in the Action genre?')
         console.log('Copy and paste the following answer into the text box: \n\n');
 
         console.log(output.movies)
