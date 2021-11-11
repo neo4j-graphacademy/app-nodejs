@@ -104,6 +104,8 @@ describe('11. Movie Lists', () => {
 
         const output = await service.getForDirector(coppola, 'imdbRating', 'DESC', 30)
 
+        expect(output.length).toEqual(16)
+
         console.clear()
 
         console.log('\n\n')
