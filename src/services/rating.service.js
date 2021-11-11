@@ -3,7 +3,7 @@ import { ratings } from '../../test/fixtures/ratings.js'
 import NotFoundError from '../errors/not-found.error.js'
 import { toNativeTypes } from '../utils.js'
 
-// TODO: Import the `int` function from neo4j-driver
+import { int } from 'neo4j-driver'
 
 export default class ReviewService {
   /**
@@ -59,11 +59,43 @@ export default class ReviewService {
    */
   // tag::add[]
   async add(userId, movieId, rating) {
-    // TODO: Convert the native integer into a Neo4j Integer
-    // TODO: Save the rating in the database
-    // TODO: Return movie details and a rating
+    // tag::convert[]
+    // Convert the native integer into a Neo4j Integer
+    rating = int(rating)
+    // end::convert[]
 
-    return goodfellas
+    // tag::write[]
+    // Save the rating in the database
+    const session = this.driver.session()
+    const res = await session.writeTransaction(tx => tx.run(`
+      MATCH (u:User {userId: $userId})
+      MATCH (m:Movie {tmdbId: $movieId})
+
+      MERGE (u)-[r:RATED]->(m)
+      SET r.rating = $rating
+
+      RETURN m {
+        .*,
+        rating: r.rating
+      } AS movie
+    `, { userId, movieId, rating }))
+    // end::write[]
+
+    // tag::throw[]
+    if ( res.records.length === 0 ) {
+      throw new NotFoundError(`Could not create rating for Movie ${movieId} by User ${userId}`)
+    }
+    // end::throw[]
+
+    // Close the session
+    await session.close()
+
+    // tag::addreturn[]
+    const [ first ] = res.records
+    const movie = first.get('movie')
+
+    return toNativeTypes(movie)
+    // end::addreturn[]
   }
   // end::add[]
 
