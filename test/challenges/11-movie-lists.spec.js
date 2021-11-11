@@ -110,7 +110,7 @@ describe('11. Movie Lists', () => {
 
         console.log('\n\n')
         console.log('Here is the answer to the quiz question on the lesson:')
-        console.log('How many films has Francis Ford Coppola\'s directed?')
+        console.log('How many films has Francis Ford Coppola directed?')
         console.log('Copy and paste the following answer into the text box: \n\n');
 
         console.log(output.length);
