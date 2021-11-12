@@ -2,13 +2,14 @@ MATCH (:Movie {tmdbId: $id})-[:IN_GENRE|ACTED_IN|DIRECTED]->()<-[:IN_GENRE|ACTED
 WHERE exists(m.imdbRating)
 
 WITH m, count(*) AS inCommon
-ORDER BY inCommon DESC, m.imdbRating DESC
+WITH m, inCommon, m.imdbRating * inCommon AS score
+ORDER BY score DESC
 
 SKIP $skip
 LIMIT $limit
 
 RETURN m {
     .*,
-    score: m.imdbRating * inCommon,
+    score: score,
     favorite: m.tmdbId IN $favorites
 } AS movie

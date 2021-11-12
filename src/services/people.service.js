@@ -36,13 +36,13 @@ export default class PeopleService {
    * @param {number} skip           The number of records to skip
    * @returns {Promise<Record<string, any>[]>}
    */
-  // tag::PeopleService.all[]
+  // tag::all[]
   async all(q, sort = 'name', order = 'ASC', limit = 6, skip = 0) {
     // TODO: Get a list of people from the database
 
     return people.slice(skip, skip + limit)
   }
-  // end::PeopleService.all[]
+  // end::all[]
 
   /**
    * @public
@@ -53,13 +53,13 @@ export default class PeopleService {
    * @param {string} id   The tmdbId for the user
    * @returns {Promise<Record<string, any>>}
    */
-  // tag::PeopleService.findById[]
+  // tag::findById[]
   async findById(id) {
     // TODO: Find a user by their ID
 
     return pacino
   }
-  // end::PeopleService.findById[]
+  // end::findById[]
 
   /**
    * @public
@@ -71,12 +71,12 @@ export default class PeopleService {
    * @param {number} skip   The number of records to skip
    * @returns {Promise<Record<string, any>[]>}
    */
-  // tag::PeopleService.getSimilarPeople[]
+  // tag::getSimilarPeople[]
   async getSimilarPeople(id, limit = 6, skip = 0) {
     // TODO: Get a list of similar people to the person by their id
 
     return people.slice(skip, skip + limit)
   }
-  // end::PeopleService.getSimilarPeople[]
+  // end::getSimilarPeople[]
 
 }
