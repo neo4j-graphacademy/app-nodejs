@@ -37,13 +37,13 @@ export default class ReviewService {
    * @param {number} skip     The number of records to skip
    * @returns {Promise<Record<string, any>>}
    */
-  // tag::RatingService.forMovie[]
+  // tag::forMovie[]
   async forMovie(id, sort = 'timestamp', order = 'ASC', limit = 6, skip = 0) {
     // TODO: Get ratings for a Movie
 
     return ratings
   }
-  // end::RatingService.forMovie[]
+  // end::forMovie[]
 
   /**
    * @public
