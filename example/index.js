@@ -62,6 +62,30 @@ const driver = neo4j.driver('neo4j://localhost:7687',
 
 
 /**
+ * It is considered best practise to inject an instance of the driver.
+ * This way the object can be mocked within unit tests
+ */
+class MyService {
+  driver
+
+  constructor(driver) {
+    this.driver = driver
+  }
+
+  method() {
+    // tag::session[]
+    // Open a new session
+    const session = this.driver.session()
+    // end::session[]
+
+    // Do something with the session...
+
+    // Close the session
+    await session.close()
+  }
+}
+
+/**
  * These functions are wrapped in an `async` function so that we can use the await
  * keyword rather than the Promise API.
  */
@@ -73,10 +97,10 @@ const main = async () => {
 
   console.log('Connection verified!')
 
-  // tag::session[]
+  // tag::driver.session[]
   // Open a new session
-  const session = this.driver.session()
-  // end::session[]
+  const session = driver.session()
+  // end::driver.session[]
 
   // Run a query
   const query = 'MATCH (n) RETURN count(n) AS count'
@@ -133,9 +157,13 @@ const manualTransaction = async () => {
   const session = this.driver.session()
 
   // tag::session.beginTransaction[]
+  // Open a new session
+  const session = driver.session({
+    defaultAccessMode: session.WRITE
+  })
+
   // Manually create a transaction
-  const writeSession = driver.session({ defaultAccessMode: session.WRITE })
-  const tx = writeSession.beginTransaction()
+  const tx = session.beginTransaction()
   // end::session.beginTransaction[]
 
   const query = 'MATCH (n) RETURN count(n) AS count'
