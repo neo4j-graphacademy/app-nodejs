@@ -46,6 +46,7 @@ export default class AuthService {
 
     // tag::catch[]
     try {
+      // tag::create[]
       const res = await session.writeTransaction(tx =>
         tx.run(
           `CREATE (u:User {
@@ -58,14 +59,13 @@ export default class AuthService {
           { email, encrypted, name }
         )
       )
-    )
-    // end::create[]
+      // end::create[]
 
-    // tag::extract[]
-    // Extract safe properties from the user node (`u`) in the first row
-    const node = res.records[0].get('u')
-    const { password, ...safeProperties } = node.properties
-    // end::extract[]
+      // tag::extract[]
+      // Extract safe properties from the user node (`u`) in the first row
+      const node = res.records[0].get('u')
+      const { password, ...safeProperties } = node.properties
+      // end::extract[]
 
       return {
         ...safeProperties,
