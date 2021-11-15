@@ -61,10 +61,11 @@ export default class AuthService {
     )
     // end::create[]
 
-    // tag::return[]
+    // tag::extract[]
     // Extract safe properties from the user node (`u`) in the first row
     const node = res.records[0].get('u')
     const { password, ...safeProperties } = node.properties
+    // end::extract[]
 
       return {
         ...safeProperties,
@@ -85,11 +86,7 @@ export default class AuthService {
       // Close the session
       session.close()
     }
-<<<<<<< HEAD
     // end::catch[]
-=======
-    // end::return[]
->>>>>>> 03-registering-a-user
   }
   // end::register[]
 
