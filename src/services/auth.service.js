@@ -75,6 +75,9 @@ export default class AuthService {
     const { password, ...safeProperties } = node.properties
     // end::extract[]
 
+    // Close the session
+    await session.close()
+
     // tag::return[]
     return {
       ...safeProperties,
