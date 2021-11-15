@@ -92,13 +92,16 @@ const subscribe = () => {
     })
     .subscribe({
       onKeys: keys => {
-        console.log(keys)
+        console.log(keys) // ['name]
       },
       onNext: record => {
-        console.log(record.get('name'))
+        console.log(record.get('name')) // 'Alice'
       },
-      onCompleted: () => {
-        session.close() // returns a Promise
+      onCompleted: (summary) => {
+        // `summary` holds the same information as `res.summary`
+
+        // Close the Session
+        session.close()
       },
       onError: error => {
         console.log(error)
