@@ -58,8 +58,13 @@ export default class AuthService {
           { email, encrypted, name }
         )
       )
+    )
+    // end::create[]
 
-      const { password, ...safeProperties } = res.records[0].get('u').properties
+    // tag::return[]
+    // Extract safe properties from the user node (`u`) in the first row
+    const node = res.records[0].get('u')
+    const { password, ...safeProperties } = node.properties
 
       return {
         ...safeProperties,
