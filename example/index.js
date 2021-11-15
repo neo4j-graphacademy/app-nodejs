@@ -75,7 +75,7 @@ const main = async () => {
 
   // tag::session[]
   // Open a new session
-  const session = this.driver.session()
+  const session = driver.session()
   // end::session[]
 
   // Run a query
