@@ -24,7 +24,7 @@ router.get('/', async (req, res, next) => {
       = getPagination(req, MOVIE_SORT) // <1>
 
     const movieService = new MovieService(
-      req.transaction
+      getDriver()
     ) // <2>
 
     const movies = await movieService.all(
