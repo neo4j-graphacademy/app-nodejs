@@ -20,7 +20,7 @@ router.use(passport.authenticate(['jwt', 'anonymous'], { session: false }))
 // tag::list[]
 router.get('/', async (req, res, next) => {
   try {
-    const { orderBy, order, limit, skip }
+    const { sort, order, limit, skip }
       = getPagination(req, MOVIE_SORT) // <1>
 
     const movieService = new MovieService(
@@ -28,7 +28,7 @@ router.get('/', async (req, res, next) => {
     ) // <2>
 
     const movies = await movieService.all(
-      orderBy, order, limit, skip
+      sort, order, limit, skip
     ) // <3>
 
     res.json(movies)
