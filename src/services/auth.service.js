@@ -67,16 +67,18 @@ export default class AuthService {
         { email, encrypted, name }
       )
     )
+    // end::create[]
 
+    // tag::return[]
     // Extract safe properties from the user node (`u`) in the first row
     const node = res.records[0].get('u')
     const { password, ...safeProperties } = node.properties
-    // end::create[]
 
     return {
       ...safeProperties,
       token: jwt.sign(this.userToClaims(safeProperties), process.env.JWT_SECRET),
     }
+    // end::return[]
   }
   // end::register[]
 
