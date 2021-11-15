@@ -72,7 +72,9 @@ export default class MovieService {
     // Close the session
     await session.close()
 
+    // tag::return[]
     return movies
+    // end::return[]
   }
   // end::all[]
 
