@@ -89,7 +89,7 @@ const subscribe = () => {
   session
     .run('MERGE (alice:Person {name : $nameParam}) RETURN alice.name AS name', {
       nameParam: 'Alice'
-    })
+  })
     .subscribe({
       onKeys: keys => {
         console.log(keys) // ['name]

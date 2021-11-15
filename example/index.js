@@ -133,9 +133,13 @@ const manualTransaction = async () => {
   const session = this.driver.session()
 
   // tag::session.beginTransaction[]
+  // Open a new session
+  const session = driver.session({
+    defaultAccessMode: session.WRITE
+  })
+
   // Manually create a transaction
-  const writeSession = driver.session({ defaultAccessMode: session.WRITE })
-  const tx = writeSession.beginTransaction()
+  const tx = session.beginTransaction()
   // end::session.beginTransaction[]
 
   const query = 'MATCH (n) RETURN count(n) AS count'
