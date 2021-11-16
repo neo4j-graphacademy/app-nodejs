@@ -72,7 +72,8 @@ export default class ReviewService {
       MATCH (m:Movie {tmdbId: $movieId})
 
       MERGE (u)-[r:RATED]->(m)
-      SET r.rating = $rating
+      SET r.rating = $rating,
+        r.timestamp = timestamp()
 
       RETURN m {
         .*,
