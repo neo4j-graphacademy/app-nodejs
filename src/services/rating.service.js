@@ -66,7 +66,11 @@ export default class ReviewService {
 
     // tag::write[]
     // Save the rating in the database
+
+    // Open a new session
     const session = this.driver.session()
+
+    // Run the cypher query
     const res = await session.writeTransaction(tx => tx.run(`
       MATCH (u:User {userId: $userId})
       MATCH (m:Movie {tmdbId: $movieId})
@@ -80,6 +84,9 @@ export default class ReviewService {
         rating: r.rating
       } AS movie
     `, { userId, movieId, rating }))
+
+    // Close the session
+    await session.close()
     // end::write[]
 
     // tag::throw[]
@@ -88,8 +95,7 @@ export default class ReviewService {
     }
     // end::throw[]
 
-    // Close the session
-    await session.close()
+
 
     // tag::addreturn[]
     // Return movie details and a rating
