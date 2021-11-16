@@ -32,7 +32,7 @@ const promiseApi = () => {
       // Finally, close the session
       session.close()
     })
-    // tag::promise[]
+    // end::promise[]
 }
 
 
