@@ -46,7 +46,7 @@ export default class FavoriteService {
       MATCH (u:User {userId: $userId})-[r:HAS_FAVORITE]->(m:Movie)
       RETURN m {
         .*,
-        favorite: false
+        favorite: true
       } AS movie
       ORDER BY m.\`${orderBy}\` ${order}
       SKIP $skip
