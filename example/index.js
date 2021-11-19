@@ -127,10 +127,11 @@ const readTransaction = async () => {
   // Run a query within a Read Transaction
   const res = await session.readTransaction(tx => {
     return tx.run(
-      `MATCH (p:Person)-[:LIVES_IN]->(c:City)
-      WHERE c.name = $location // <1>
-      RETURN p.name AS name`,
-      { location: 'Barcelona' } // <2>
+      `MATCH (p:Person)-[:ACTED_IN]->(m:Movie)
+      WHERE m.title = $title // <1>
+      RETURN p.name AS name
+      LIMIT 10`,
+      { title: 'Arthur' } // <2>
     )
   })
   // end::session.readTransaction[]
