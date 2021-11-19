@@ -1,13 +1,14 @@
-MATCH (g:Genre)<-[:IN_GENRE]-(m:Movie)
-WHERE exists(m.imdbRating) AND exists(m.poster) AND g.name <> '(no genres listed)'
-WITH g, m
-ORDER BY m.imdbRating DESC
-
-WITH g, head(collect(m)) AS movie
+MATCH (g:Genre)
+CALL {
+  WITH g
+  MATCH (g)<-[:IN_GENRE]-(m:Movie)
+  WHERE exists(m.imdbRating) AND exists(m.poster) AND g.name <> '(no genres listed)'
+  RETURN m.poster AS poster
+  ORDER BY m.imdbRating DESC LIMIT 1
+}
 
 RETURN g {
-    .name,
-    movies: size((g)<-[:IN_GENRE]-()),
-    poster: movie.poster
-} AS genre
+  .*,
+  poster: poster
+}
 ORDER BY g.name ASC
