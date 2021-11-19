@@ -13,7 +13,7 @@ const promiseApiExample = () => {
 
   // tag::promises[]
   session.readTransaction(tx => tx.run(
-    'MATCH (p:Person) RETURN p.name AS name')
+    'MATCH (p:Person) RETURN p.name AS name LIMIT 10')
   )
     .then(res => {
       return res.records.map(row => {
@@ -41,7 +41,7 @@ const asyncAwaitExample = async () => {
   try {
     const res = await session.readTransaction(tx =>
       tx.run(
-        'MATCH (p:Person) RETURN p.name AS name'
+        'MATCH (p:Person) RETURN p.name AS name LIMIT 10'
       )
     )
 
