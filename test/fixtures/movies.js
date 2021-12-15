@@ -1,7 +1,7 @@
 /*
 MATCH (n:Movie)
 
-WHERE exists(n.imdbRating) and exists(n.poster)
+WHERE n.imdbRating IS NOT NULL and n.poster IS NOT NULL
 
 WITH n {
   tmdbId,
@@ -318,7 +318,7 @@ export const popular = [
 /*
 MATCH (n:Movie)
 
-WHERE exists(n.released) and exists(n.poster)
+WHERE n.released IS NOT NULL and n.poster IS NOT NULL
 
 WITH n {
   .tmdbId,
