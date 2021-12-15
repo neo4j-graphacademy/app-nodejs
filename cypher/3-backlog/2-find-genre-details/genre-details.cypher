@@ -1,5 +1,5 @@
 MATCH (g:Genre {name: $name})<-[:IN_GENRE]-(m:Movie)
-WHERE exists(m.imdbRating) AND exists(m.poster) AND g.name <> '(no genres listed)'
+WHERE m.imdbRating IS NOT NULL AND m.poster IS NOT NULL AND g.name <> '(no genres listed)'
 WITH g, m
 ORDER BY m.imdbRating DESC
 
