@@ -14,9 +14,8 @@ const main = async () => {
 
   const session = driver.session()
 
-
-  // Execute a query within a read transaction
   // tag::run[]
+  // Execute a query within a read transaction
   const res = await session.readTransaction(tx => tx.run(`
     MATCH path = (person:Person)-[actedIn:ACTED_IN]->(movie:Movie)
     RETURN path, person, actedIn, movie
@@ -24,8 +23,8 @@ const main = async () => {
   `))
   // end::run[]
 
-  // Get the first row
   // tag::row[]
+  // Get the first row
   const row = res.records[0]
   // end::row[]
 
