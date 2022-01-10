@@ -46,7 +46,7 @@ export default class MovieService {
     // Execute a query in a new Read Transaction
     const res = await session.readTransaction(tx => tx.run(`
       MATCH (m:Movie)
-      WHERE exists(m.\`${sort}\`)
+      WHERE m.\`${sort}\` IS NOT NULL
       RETURN m { .* } AS movie
       ORDER BY m.\`${sort}\` ${order}
       SKIP $skip
