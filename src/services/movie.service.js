@@ -52,7 +52,7 @@ export default class MovieService {
       // favorite flag appened to the movie's properties
       return tx.run(`
         MATCH (m:Movie)
-        WHERE exists(m.\`${sort}\`)
+        WHERE m.\`${sort}\` IS NOT NULL
         RETURN m {
           .*,
           favorite: m.tmdbId IN $favorites
