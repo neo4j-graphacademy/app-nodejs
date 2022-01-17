@@ -122,6 +122,9 @@ export default class AuthService {
     )
     // end::query[]
 
+    // Close the session
+    await session.close()
+
     // tag::norecords[]
     // User not found, return false
     if ( res.records.length === 0 ) {
@@ -142,8 +145,7 @@ export default class AuthService {
     }
     // end::password[]
 
-    // Close the session
-    await session.close()
+
 
     // tag::return[]
     // Extract the claims for the JWT
