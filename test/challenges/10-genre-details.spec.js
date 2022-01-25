@@ -19,7 +19,7 @@ describe('10. Finding Genre Details', () => {
         await closeDriver()
     })
 
-    it('should retrieve a list of genres', async () => {
+    it('should retrieve genre details by name', async () => {
         const driver = getDriver()
         const service = new GenreService(driver)
 
