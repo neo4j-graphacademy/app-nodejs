@@ -3,12 +3,7 @@ import express from 'express'
 import cors from 'cors'
 import bodyParser from 'body-parser'
 import { config } from 'dotenv'
-import movies from './routes/movies.routes.js'
-import genres from './routes/genres.routes.js'
-import auth from './routes/auth.routes.js'
-import account from './routes/account.routes.js'
-import people from './routes/people.routes.js'
-import status from './routes/status.routes.js'
+import routes from './routes/index.js'
 import errorMiddleware from './middleware/error.middleware.js'
 import passport from 'passport'
 import './passport/index.js'
@@ -38,13 +33,10 @@ initDriver(NEO4J_URI, NEO4J_USERNAME, NEO4J_PASSWORD)
 // Serve the UI
 app.use(express.static('public'))
 
-// Register Route Handlers
-app.use('/api/movies', movies)
-app.use('/api/genres', genres)
-app.use('/api/auth', auth)
-app.use('/api/account', account)
-app.use('/api/people', people)
-app.use('/api/status', status)
+// Register API Route Handlers
+const { API_PREFIX } = process.env
+
+app.use(API_PREFIX || '/api', routes)
 
 // Handle Errors
 app.use(errorMiddleware)
