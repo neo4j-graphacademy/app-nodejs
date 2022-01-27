@@ -8,6 +8,5 @@ publish="public"
   status = 200
   force = true
 
-[context.production.environment]
-  API_PREFIX = "/.netlify/serverless/index/"
+[build.environment]
   NODE_VERSION = "v14.18.0"
