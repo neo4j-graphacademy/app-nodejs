@@ -56,7 +56,7 @@ export default class GenreService {
       RETURN g {
         .*,
         poster: poster
-      }
+      } as genre
       ORDER BY g.name ASC
     `))
 
