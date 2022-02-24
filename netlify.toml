@@ -1,0 +1,12 @@
+[build]
+functions="src/serverless"
+publish="public"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/serverless/index/:splat"
+  status = 200
+  force = true
+
+[build.environment]
+  NODE_VERSION = "v14.18.0"
