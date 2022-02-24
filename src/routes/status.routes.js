@@ -18,6 +18,7 @@ router.get('/', (req, res) => {
   let register = false
   let handleConstraintErrors = false
   let authentication = false
+  let apiPrefix = process.env.API_PREFIX
 
   res.json({
     status: 'OK',
@@ -26,6 +27,7 @@ router.get('/', (req, res) => {
     register,
     handleConstraintErrors,
     authentication,
+    apiPrefix,
   })
 })
 
