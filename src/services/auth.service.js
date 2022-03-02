@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken'
 import { hash, compare } from 'bcrypt'
 import { user } from '../../test/fixtures/users.js'
 import ValidationError from '../errors/validation.error.js'
+import { JWT_SECRET, SALT_ROUNDS } from '../constants.js'
 
 export default class AuthService {
   /**
@@ -37,9 +38,7 @@ export default class AuthService {
    */
   // tag::register[]
   async register(email, plainPassword, name) {
-    const encrypted = await hash(plainPassword,
-      parseInt(process.env.SALT_ROUNDS)
-    )
+    const encrypted = await hash(plainPassword, parseInt(SALT_ROUNDS))
 
     // Open a new session
     const session = this.driver.session()
@@ -69,7 +68,7 @@ export default class AuthService {
 
       return {
         ...safeProperties,
-        token: jwt.sign(this.userToClaims(safeProperties), process.env.JWT_SECRET),
+        token: jwt.sign(this.userToClaims(safeProperties), JWT_SECRET),
       }
     }
     catch (e) {
@@ -153,7 +152,7 @@ export default class AuthService {
 
     return {
       ...safeProperties,
-      token: jwt.sign(this.userToClaims(safeProperties), process.env.JWT_SECRET),
+      token: jwt.sign(this.userToClaims(safeProperties), JWT_SECRET),
     }
     // end::return[]
   }
