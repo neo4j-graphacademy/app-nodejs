@@ -113,7 +113,7 @@ export default class AuthService {
 
   /**
    * @public
-   * This method should take the claims encoded into a JWT token and returm
+   * This method should take the claims encoded into a JWT token and return
    * the information needed to authenticate this user against the database.
    *
    * @param {Record<string, any>} claims
