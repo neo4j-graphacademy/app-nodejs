@@ -30,7 +30,7 @@ const main = async () => {
 
   // Get a node
   // tag::get[]
-  const person = row.get('movie')
+  const movie = row.get('movie')
   // end::get[]
 
   // Working with node objects
