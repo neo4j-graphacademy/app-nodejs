@@ -57,6 +57,7 @@ describe('03. Registering a User', () => {
 
         expect(user.properties.email).toEqual(email)
         expect(user.properties.name).toEqual(name)
+        expect(user.properties.password).toBeDefined()
         expect(user.properties.password).not.toEqual(password, 'Password should be hashed')
     })
 })
