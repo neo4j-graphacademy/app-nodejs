@@ -37,7 +37,7 @@ export default class FavoriteService {
    * @returns {Promise<Record<string, any>[]>}  An array of Movie objects
    */
   // tag::all[]
-  async all(userId, orderBy = 'title', order = 'ASC', limit = 6, skip = 0) {
+  async all(userId, sort = 'title', order = 'ASC', limit = 6, skip = 0) {
     // Open a new session
     const session = this.driver.session()
 
@@ -48,7 +48,7 @@ export default class FavoriteService {
         .*,
         favorite: true
       } AS movie
-      ORDER BY m.\`${orderBy}\` ${order}
+      ORDER BY m.\`${sort}\` ${order}
       SKIP $skip
       LIMIT $limit
     `, { userId, skip: int(skip), limit: int(limit) }))
