@@ -2,15 +2,12 @@ import path from 'path'
 import express from 'express'
 import cors from 'cors'
 import bodyParser from 'body-parser'
-import { config } from 'dotenv'
 import routes from './routes/index.js'
 import errorMiddleware from './middleware/error.middleware.js'
 import passport from 'passport'
 import './passport/index.js'
 import { initDriver } from './neo4j.js'
-
-// Load config from .env
-config()
+import { API_PREFIX, NEO4J_PASSWORD, NEO4J_URI, NEO4J_USERNAME } from './constants.js'
 
 // Create Express instance
 const app = express()
@@ -22,21 +19,13 @@ app.use(cors())
 app.use(bodyParser.json())
 
 // Connect to Neo4j and Verify Connectivity
-const {
-  NEO4J_URI,
-  NEO4J_USERNAME,
-  NEO4J_PASSWORD,
-} = process.env
-
 initDriver(NEO4J_URI, NEO4J_USERNAME, NEO4J_PASSWORD)
 
 // Serve the UI
 app.use(express.static('public'))
 
 // Register API Route Handlers
-const { API_PREFIX } = process.env
-
-app.use(API_PREFIX || '/api', routes)
+app.use(API_PREFIX, routes)
 
 // Handle Errors
 app.use(errorMiddleware)
