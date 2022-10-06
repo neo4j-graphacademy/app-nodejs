@@ -16,10 +16,10 @@ let driver
  * @param {string} uri   The neo4j URI, eg. `neo4j://localhost:7687`
  * @param {string} username   The username to connect to Neo4j with, eg `neo4j`
  * @param {string} password   The password for the user
- * @returns {neo4j.Driver}
+ * @returns {Promise<neo4j.Driver>}
  */
 // tag::initDriver[]
-export function initDriver(uri, username, password) {
+export async function initDriver(uri, username, password) {
   // TODO: Create an instance of the driver here
 }
 // end::initDriver[]
