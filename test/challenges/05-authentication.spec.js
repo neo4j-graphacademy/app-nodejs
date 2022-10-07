@@ -22,7 +22,7 @@ describe('05. Authenticating a User', () => {
         const driver = await initDriver(NEO4J_URI, NEO4J_USERNAME, NEO4J_PASSWORD)
 
         const session = await driver.session()
-        await session.writeTransaction(tx => tx.run(`
+        await session.executeWrite(tx => tx.run(`
             MATCH (u:User {email: $email}) DETACH DELETE u
         `, { email }))
     })
@@ -65,7 +65,7 @@ describe('05. Authenticating a User', () => {
         const driver = getDriver()
 
         const session = await driver.session()
-        await session.writeTransaction(tx => tx.run(`
+        await session.executeWrite(tx => tx.run(`
             MATCH (u:User {email: $email})
             SET u.authenticatedAt = datetime()
         `, { email }))

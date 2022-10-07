@@ -12,7 +12,7 @@ const promiseApiExample = () => {
   const session = driver.session()
 
   // tag::promises[]
-  session.readTransaction(tx => tx.run(
+  session.executeRead(tx => tx.run(
     'MATCH (p:Person) RETURN p.name AS name LIMIT 10')
   )
     .then(res => {
@@ -39,7 +39,7 @@ const asyncAwaitExample = async () => {
 
   // tag::async[]
   try {
-    const res = await session.readTransaction(tx =>
+    const res = await session.executeRead(tx =>
       tx.run(
         'MATCH (p:Person) RETURN p.name AS name LIMIT 10'
       )
@@ -70,7 +70,7 @@ const rxExample = async () => {
 
   // tag::rxjs[]
   rxSession
-    .writeTransaction(txc =>
+    .executeWrite(txc =>
       txc
         .run('MERGE (p:Person) RETURN p.name AS name LIMIT 10')
         .records()

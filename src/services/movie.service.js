@@ -2,6 +2,7 @@ import { goodfellas, popular } from '../../test/fixtures/movies.js'
 import { roles } from '../../test/fixtures/people.js'
 import { toNativeTypes } from '../utils.js'
 import NotFoundError from '../errors/not-found.error.js'
+import { int } from 'neo4j-driver'
 
 // TODO: Import the `int` function from neo4j-driver
 

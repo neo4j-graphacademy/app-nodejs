@@ -23,7 +23,7 @@ describe('07. My Favorites List', () => {
         const driver = await initDriver(NEO4J_URI, NEO4J_USERNAME, NEO4J_PASSWORD)
 
         const session = await driver.session()
-        await session.writeTransaction(tx => tx.run(`
+        await session.executeWrite(tx => tx.run(`
             MERGE (u:User {userId: $userId})
             SET u.email = $email
         `, { userId, email }))

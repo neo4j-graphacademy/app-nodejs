@@ -120,12 +120,12 @@ const main = async () => {
 
 }
 
-const readTransaction = async () => {
+const executeRead = async () => {
   const session = this.driver.session()
 
-  // tag::session.readTransaction[]
+  // tag::session.executeRead[]
   // Run a query within a Read Transaction
-  const res = await session.readTransaction(tx => {
+  const res = await session.executeRead(tx => {
     return tx.run(
       `MATCH (p:Person)-[:ACTED_IN]->(m:Movie)
       WHERE m.title = $title // <1>
@@ -134,22 +134,22 @@ const readTransaction = async () => {
       { title: 'Arthur' } // <2>
     )
   })
-  // end::session.readTransaction[]
+  // end::session.executeRead[]
 
   await session.close()
 }
 
-const writeTransaction = async () => {
+const executeWrite = async () => {
   const session = this.driver.session()
 
-  // tag::session.writeTransaction[]
-  const res = await session.writeTransaction(tx => {
+  // tag::session.executeWrite[]
+  const res = await session.executeWrite(tx => {
     return tx.run(
       'CREATE (p:Person {name: $name})',
       { name: 'Michael' }
     )
   })
-  // end::session.writeTransaction[]
+  // end::session.executeWrite[]
 
   await session.close()
 }
@@ -207,7 +207,7 @@ async function createPerson(name) {
   // end::sessionWithArgs[]
 
   // Create a node within a write transaction
-  const res = await session.writeTransaction(tx => {
+  const res = await session.executeWrite(tx => {
     return tx.run('CREATE (p:Person {name: $name}) RETURN p', { name })
   })
 

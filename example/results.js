@@ -16,7 +16,7 @@ const main = async () => {
 
   // tag::run[]
   // Execute a query within a read transaction
-  const res = await session.readTransaction(tx => tx.run(`
+  const res = await session.executeRead(tx => tx.run(`
     MATCH path = (person:Person)-[actedIn:ACTED_IN]->(movie:Movie)
     RETURN path, person, actedIn, movie
     LIMIT 1

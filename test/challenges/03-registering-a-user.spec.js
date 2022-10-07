@@ -22,7 +22,7 @@ describe('03. Registering a User', () => {
         const driver = await initDriver(NEO4J_URI, NEO4J_USERNAME, NEO4J_PASSWORD)
 
         const session = driver.session()
-        await session.writeTransaction(tx =>
+        await session.executeWrite(tx =>
             tx.run(`MATCH (u:User {email: $email}) DETACH DELETE u`, {email})
         )
         await session.close()
@@ -47,7 +47,7 @@ describe('03. Registering a User', () => {
         // Expect user exists in database
         const session = await driver.session()
 
-        const res = await session.readTransaction(tx =>
+        const res = await session.executeRead(tx =>
             tx.run('MATCH (u:User {email: $email}) RETURN u', { email })
         )
 

@@ -27,7 +27,7 @@ describe('04. Handling Driver Errors', () => {
         const driver = getDriver()
         const session = driver.session()
 
-        await session.writeTransaction(tx =>
+        await session.executeWrite(tx =>
             tx.run(`MATCH (u:User {email: $email}) DETACH DELETE u`, {email})
         )
 
@@ -41,7 +41,7 @@ describe('04. Handling Driver Errors', () => {
     it('should find a unique constraint', async () => {
         const driver = getDriver()
         const session = driver.session()
-        const res = await session.readTransaction(tx => tx.run(
+        const res = await session.executeRead(tx => tx.run(
             `CALL db.constraints()
             YIELD name, description
             WHERE description = 'CONSTRAINT ON ( user:User ) ASSERT (user.email) IS UNIQUE'

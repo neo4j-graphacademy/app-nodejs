@@ -2,12 +2,13 @@ import path from 'path'
 import express from 'express'
 import cors from 'cors'
 import bodyParser from 'body-parser'
+import session from 'express-session'
 import routes from './routes/index.js'
 import errorMiddleware from './middleware/error.middleware.js'
 import passport from 'passport'
 import './passport/index.js'
 import { initDriver } from './neo4j.js'
-import { API_PREFIX, NEO4J_PASSWORD, NEO4J_URI, NEO4J_USERNAME } from './constants.js'
+import { API_PREFIX, JWT_SECRET, NEO4J_PASSWORD, NEO4J_URI, NEO4J_USERNAME } from './constants.js'
 
 // Create Express instance
 const app = express()
@@ -15,6 +16,11 @@ const app = express()
 // Authentication
 app.use(passport.initialize())
 
+app.use(session({
+  secret: JWT_SECRET,
+  resave: false,
+  saveUninitialized: true,
+}))
 app.use(cors())
 app.use(bodyParser.json())
 

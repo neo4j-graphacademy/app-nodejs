@@ -9,7 +9,7 @@ const promiseApi = () => {
 
   // tag::promise[]
   // Run the query...
-  session.writeTransaction(tx => tx.run(`
+  session.executeWrite(tx => tx.run(`
     CREATE (:User {email: $email})
   `, { email: 'uniqueconstraint@example.com' }))
     .then(res => {
@@ -45,7 +45,7 @@ const asyncFunction = async () => {
 
   try {
     // Run the query...
-    const res = await session.writeTransaction(tx => tx.run(`
+    const res = await session.executeWrite(tx => tx.run(`
       CREATE (:User {email: $email})
     `, { email: 'uniqueconstraint@example.com' }))
 
