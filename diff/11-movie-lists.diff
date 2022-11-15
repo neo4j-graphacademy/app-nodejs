@@ -1,0 +1,130 @@
+diff --git a/src/services/movie.service.js b/src/services/movie.service.js
+index d65ca23..b43dce4 100644
+--- a/src/services/movie.service.js
++++ b/src/services/movie.service.js
+@@ -104,10 +104,39 @@ export default class MovieService {
+    */
+   // tag::getByGenre[]
+   async getByGenre(name, sort = 'title', order = 'ASC', limit = 6, skip = 0, userId = undefined) {
+-    // TODO: Get Movies in a Genre
++    // Get Movies in a Genre
+     // MATCH (m:Movie)-[:IN_GENRE]->(:Genre {name: $name})
+ 
+-    return popular.slice(skip, skip + limit)
++    // Open a new session
++    const session = this.driver.session()
++
++    // Execute a query in a new Read Transaction
++    const res = await session.executeRead(async tx => {
++      // Get an array of IDs for the User's favorite movies
++      const favorites = await this.getUserFavorites(tx, userId)
++
++      // Retrieve a list of movies with the
++      // favorite flag appened to the movie's properties
++      return tx.run(`
++        MATCH (m:Movie)-[:IN_GENRE]->(:Genre {name: $name})
++        WHERE m.\`${sort}\` IS NOT NULL
++        RETURN m {
++          .*,
++          favorite: m.tmdbId IN $favorites
++        } AS movie
++        ORDER BY m.\`${sort}\` ${order}
++        SKIP $skip
++        LIMIT $limit
++      `, { skip: int(skip), limit: int(limit), favorites, name })
++    })
++
++    // Get a list of Movies from the Result
++    const movies = res.records.map(row => toNativeTypes(row.get('movie')))
++
++    // Close the session
++    await session.close()
++
++    return movies
+   }
+   // end::getByGenre[]
+ 
+@@ -134,10 +163,39 @@ export default class MovieService {
+    */
+   // tag::getForActor[]
+   async getForActor(id, sort = 'title', order = 'ASC', limit = 6, skip = 0, userId = undefined) {
+-    // TODO: Get Movies acted in by a Person
++    // Get Movies acted in by a Person
+     // MATCH (:Person {tmdbId: $id})-[:ACTED_IN]->(m:Movie)
+ 
+-    return roles.slice(skip, skip + limit)
++    // Open a new session
++    const session = this.driver.session()
++
++    // Execute a query in a new Read Transaction
++    const res = await session.executeRead(async tx => {
++      // Get an array of IDs for the User's favorite movies
++      const favorites = await this.getUserFavorites(tx, userId)
++
++      // Retrieve a list of movies with the
++      // favorite flag appened to the movie's properties
++      return tx.run(`
++        MATCH (:Person {tmdbId: $id})-[:ACTED_IN]->(m:Movie)
++        WHERE m.\`${sort}\` IS NOT NULL
++        RETURN m {
++          .*,
++          favorite: m.tmdbId IN $favorites
++        } AS movie
++        ORDER BY m.\`${sort}\` ${order}
++        SKIP $skip
++        LIMIT $limit
++      `, { skip: int(skip), limit: int(limit), favorites, id })
++    })
++
++    // Get a list of Movies from the Result
++    const movies = res.records.map(row => toNativeTypes(row.get('movie')))
++
++    // Close the session
++    await session.close()
++
++    return movies
+   }
+   // end::getForActor[]
+ 
+@@ -164,10 +222,39 @@ export default class MovieService {
+    */
+   // tag::getForDirector[]
+   async getForDirector(id, sort = 'title', order = 'ASC', limit = 6, skip = 0, userId = undefined) {
+-    // TODO: Get Movies directed by a Person
++    // Get Movies directed by a Person
+     // MATCH (:Person {tmdbId: $id})-[:DIRECTED]->(m:Movie)
+ 
+-    return popular.slice(skip, skip + limit)
++    // Open a new session
++    const session = this.driver.session()
++
++    // Execute a query in a new Read Transaction
++    const res = await session.executeRead(async tx => {
++      // Get an array of IDs for the User's favorite movies
++      const favorites = await this.getUserFavorites(tx, userId)
++
++      // Retrieve a list of movies with the
++      // favorite flag appened to the movie's properties
++      return tx.run(`
++        MATCH (:Person {tmdbId: $id})-[:DIRECTED]->(m:Movie)
++        WHERE m.\`${sort}\` IS NOT NULL
++        RETURN m {
++          .*,
++          favorite: m.tmdbId IN $favorites
++        } AS movie
++        ORDER BY m.\`${sort}\` ${order}
++        SKIP $skip
++        LIMIT $limit
++      `, { skip: int(skip), limit: int(limit), favorites, id })
++    })
++
++    // Get a list of Movies from the Result
++    const movies = res.records.map(row => toNativeTypes(row.get('movie')))
++
++    // Close the session
++    await session.close()
++
++    return movies
+   }
+   // end::getForDirector[]
+ 

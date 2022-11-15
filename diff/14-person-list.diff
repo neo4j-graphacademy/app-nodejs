@@ -1,0 +1,99 @@
+diff --git a/src/services/people.service.js b/src/services/people.service.js
+index 3f7851c..586a765 100644
+--- a/src/services/people.service.js
++++ b/src/services/people.service.js
+@@ -1,6 +1,7 @@
+ import NotFoundError from '../errors/not-found.error.js'
+ import { pacino, people } from '../../test/fixtures/people.js'
+ import { toNativeTypes } from '../utils.js'
++import { int } from 'neo4j-driver'
+ 
+ // TODO: Import the `int` function from neo4j-driver
+ 
+@@ -38,9 +39,25 @@ export default class PeopleService {
+    */
+   // tag::all[]
+   async all(q, sort = 'name', order = 'ASC', limit = 6, skip = 0) {
+-    // TODO: Get a list of people from the database
++    // Open a new database session
++    const session = this.driver.session()
+ 
+-    return people.slice(skip, skip + limit)
++    // Get a list of people from the database
++    const res = await session.executeRead(
++      tx => tx.run(`
++        MATCH (p:Person)
++        ${q !== undefined ? 'WHERE p.name CONTAINS $q' : ''}
++        RETURN p { .* } AS person
++        ORDER BY p.${sort} ${order}
++        SKIP $skip
++        LIMIT $limit
++      `, { q, skip: int(skip), limit: int(limit) })
++    )
++
++    // Close the session
++    await session.close()
++
++    return res.records.map(row => toNativeTypes(row.get('person')))
+   }
+   // end::all[]
+ 
+diff --git a/src/services/rating.service.js b/src/services/rating.service.js
+index a81e5d9..8de278b 100644
+--- a/src/services/rating.service.js
++++ b/src/services/rating.service.js
+@@ -81,6 +81,7 @@ export default class ReviewService {
+    */
+   // tag::add[]
+   async add(userId, movieId, rating) {
++<<<<<<< HEAD
+     // tag::convert[]
+     // Convert the native integer into a Neo4j Integer
+     rating = int(rating)
+@@ -131,6 +132,46 @@ export default class ReviewService {
+ 
+     return toNativeTypes(movie)
+     // end::addreturn[]
++=======
++    // Convert the native integer into a Neo4j Integer
++    rating = int(rating)
++
++    // Open a new session
++    const session = this.driver.session()
++
++    // Save the rating in the database
++    const res = await session.executeWrite(
++      tx => tx.run(
++        `
++          MATCH (u:User {userId: $userId})
++          MATCH (m:Movie {tmdbId: $movieId})
++
++          MERGE (u)-[r:RATED]->(m)
++          SET r.rating = $rating,
++              r.timestamp = timestamp()
++
++          RETURN m {
++            .*,
++            rating: r.rating
++          } AS movie
++        `,
++        { userId, movieId, rating, }
++      )
++    )
++
++    // Check User and Movie exist
++    if ( res.records.length === 0 ) {
++      throw new NotFoundError(
++        `Could not create rating for Movie ${movieId} by User ${userId}`
++      )
++    }
++
++    // Return movie details and rating
++    const [ first ] = res.records
++    const movie = first.get('movie')
++
++    return toNativeTypes(movie)
++>>>>>>> c4b72e6 (Completed challenge: Rating Movies. Create a (:User)-[:RATED]->(:Movie) relationship with a .rating property)
+   }
+   // end::add[]
+ 

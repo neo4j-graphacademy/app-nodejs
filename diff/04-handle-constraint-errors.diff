@@ -1,0 +1,417 @@
+diff --git a/diff/01-connect-to-neo4j.diff b/diff/01-connect-to-neo4j.diff
+new file mode 100644
+index 0000000..ad3d895
+--- /dev/null
++++ b/diff/01-connect-to-neo4j.diff
+@@ -0,0 +1,42 @@
++diff --git a/package-lock.json b/package-lock.json
++index d2e766d..bf65373 100644
++--- a/package-lock.json
+++++ b/package-lock.json
++@@ -15,7 +15,7 @@
++         "express": "^4.17.1",
++         "express-session": "^1.17.3",
++         "jsonwebtoken": "^8.5.1",
++-        "neo4j-driver": "^5.1.0",
+++        "neo4j-driver": "^4.4.10",
++         "passport": "^0.6.0",
++         "passport-anonymous": "^1.0.1",
++         "passport-jwt": "^4.0.0",
++diff --git a/src/neo4j.js b/src/neo4j.js
++index 026f373..47a1075 100644
++--- a/src/neo4j.js
+++++ b/src/neo4j.js
++@@ -1,4 +1,4 @@
++-// TODO: Import the neo4j-driver dependency
+++import neo4j from 'neo4j-driver'
++ 
++ /**
++  * A singleton instance of the Neo4j Driver to be used across the app
++@@ -20,7 +20,17 @@ let driver
++  */
++ // tag::initDriver[]
++ export async function initDriver(uri, username, password) {
++-  // TODO: Create an instance of the driver here
+++  driver = neo4j.driver(
+++    uri,
+++    neo4j.auth.basic(
+++      username,
+++      password
+++    )
+++  )
+++
+++  await driver.verifyConnectivity()
+++
+++  return driver
++ }
++ // end::initDriver[]
++ 
+diff --git a/diff/02-movie-lists.diff b/diff/02-movie-lists.diff
+new file mode 100644
+index 0000000..04960c8
+--- /dev/null
++++ b/diff/02-movie-lists.diff
+@@ -0,0 +1,75 @@
++diff --git a/package-lock.json b/package-lock.json
++index bf65373..d2e766d 100644
++--- a/package-lock.json
+++++ b/package-lock.json
++@@ -15,7 +15,7 @@
++         "express": "^4.17.1",
++         "express-session": "^1.17.3",
++         "jsonwebtoken": "^8.5.1",
++-        "neo4j-driver": "^4.4.10",
+++        "neo4j-driver": "^5.1.0",
++         "passport": "^0.6.0",
++         "passport-anonymous": "^1.0.1",
++         "passport-jwt": "^4.0.0",
++diff --git a/src/services/movie.service.js b/src/services/movie.service.js
++index a9b3ff6..057bfdb 100644
++--- a/src/services/movie.service.js
+++++ b/src/services/movie.service.js
++@@ -2,9 +2,9 @@ import { goodfellas, popular } from '../../test/fixtures/movies.js'
++ import { roles } from '../../test/fixtures/people.js'
++ import { toNativeTypes } from '../utils.js'
++ import NotFoundError from '../errors/not-found.error.js'
++-import { int } from 'neo4j-driver'
++ 
++-// TODO: Import the `int` function from neo4j-driver
+++// Import the `int` function from neo4j-driver
+++import { int } from 'neo4j-driver'
++ 
++ export default class MovieService {
++   /**
++@@ -40,12 +40,39 @@ export default class MovieService {
++    */
++   // tag::all[]
++   async all(sort = 'title', order = 'ASC', limit = 6, skip = 0, userId = undefined) {
++-    // TODO: Open an Session
++-    // TODO: Execute a query in a new Read Transaction
++-    // TODO: Get a list of Movies from the Result
++-    // TODO: Close the session
++-
++-    return popular
+++    // Open an Session
+++    const session = this.driver.session()
+++
+++    // tag::allcypher[]
+++    // Execute a query in a new Read Transaction
+++    const res = await session.executeRead(
+++      tx => tx.run(
+++        `
+++          MATCH (m:Movie)
+++          WHERE m.\`${sort}\` IS NOT NULL
+++          RETURN m {
+++            .*
+++          } AS movie
+++          ORDER BY m.\`${sort}\` ${order}
+++          SKIP $skip
+++          LIMIT $limit
+++        `, { skip: int(skip), limit: int(limit) })
+++    )
+++    // end::allcypher[]
+++
+++    // tag::allmovies[]
+++    // Get a list of Movies from the Result
+++    const movies = res.records.map(
+++      row => toNativeTypes(row.get('movie'))
+++    )
+++    // end::allmovies[]
+++
+++    // Close the session
+++    await session.close()
+++
+++    // tag::return[]
+++    return movies
+++    // end::return[]
++   }
++   // end::all[]
++ 
+diff --git a/diff/03-registering-a-user.diff b/diff/03-registering-a-user.diff
+new file mode 100644
+index 0000000..7f27d0d
+--- /dev/null
++++ b/diff/03-registering-a-user.diff
+@@ -0,0 +1,105 @@
++diff --git a/package-lock.json b/package-lock.json
++index d2e766d..f5ad303 100644
++--- a/package-lock.json
+++++ b/package-lock.json
++@@ -15,7 +15,7 @@
++         "express": "^4.17.1",
++         "express-session": "^1.17.3",
++         "jsonwebtoken": "^8.5.1",
++-        "neo4j-driver": "^5.1.0",
+++        "neo4j-driver": "^4.4.10",
++         "passport": "^0.6.0",
++         "passport-anonymous": "^1.0.1",
++         "passport-jwt": "^4.0.0",
++@@ -1771,14 +1771,20 @@
++       }
++     },
++     "node_modules/caniuse-lite": {
++-      "version": "1.0.30001265",
++-      "resolved": "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001265.tgz",
++-      "integrity": "sha512-YzBnspggWV5hep1m9Z6sZVLOt7vrju8xWooFAgN6BA5qvy98qPAPb7vNUzypFaoh2pb3vlfzbDO8tB57UPGbtw==",
+++      "version": "1.0.30001418",
+++      "resolved": "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001418.tgz",
+++      "integrity": "sha512-oIs7+JL3K9JRQ3jPZjlH6qyYDp+nBTCais7hjh0s+fuBwufc7uZ7hPYMXrDOJhV360KGMTcczMRObk0/iMqZRg==",
++       "dev": true,
++-      "funding": {
++-        "type": "opencollective",
++-        "url": "https://opencollective.com/browserslist"
++-      }
+++      "funding": [
+++        {
+++          "type": "opencollective",
+++          "url": "https://opencollective.com/browserslist"
+++        },
+++        {
+++          "type": "tidelift",
+++          "url": "https://tidelift.com/funding/github/npm/caniuse-lite"
+++        }
+++      ]
++     },
++     "node_modules/chalk": {
++       "version": "4.1.2",
++@@ -7551,9 +7557,9 @@
++       "dev": true
++     },
++     "caniuse-lite": {
++-      "version": "1.0.30001265",
++-      "resolved": "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001265.tgz",
++-      "integrity": "sha512-YzBnspggWV5hep1m9Z6sZVLOt7vrju8xWooFAgN6BA5qvy98qPAPb7vNUzypFaoh2pb3vlfzbDO8tB57UPGbtw==",
+++      "version": "1.0.30001418",
+++      "resolved": "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001418.tgz",
+++      "integrity": "sha512-oIs7+JL3K9JRQ3jPZjlH6qyYDp+nBTCais7hjh0s+fuBwufc7uZ7hPYMXrDOJhV360KGMTcczMRObk0/iMqZRg==",
++       "dev": true
++     },
++     "chalk": {
++diff --git a/src/services/auth.service.js b/src/services/auth.service.js
++index 2c20d6e..a97e266 100644
++--- a/src/services/auth.service.js
+++++ b/src/services/auth.service.js
++@@ -49,14 +49,44 @@ export default class AuthService {
++     }
++     // end::constraintError[]
++ 
++-    // TODO: Save user
+++    // Open a new session
+++    const session = this.driver.session()
++ 
++-    const { password, ...safeProperties } = user
+++    // tag::create[]
+++    // Create the User node in a write transaction
+++    const res = await session.executeWrite(
+++      tx => tx.run(
+++        `
+++          CREATE (u:User {
+++            userId: randomUuid(),
+++            email: $email,
+++            password: $encrypted,
+++            name: $name
+++          })
+++          RETURN u
+++        `,
+++        { email, encrypted, name }
+++      )
+++    )
+++    // end::create[]
++ 
+++    // tag::extract[]
+++    // Extract the user from the result
+++    const [ first ] = res.records
+++    const node = first.get('u')
+++
+++    const { password, ...safeProperties } = node.properties
+++    // end::extract[]
+++
+++    // Close the session
+++    await session.close()
+++
+++    // tag::return[]
++     return {
++       ...safeProperties,
++       token: jwt.sign(this.userToClaims(safeProperties), JWT_SECRET),
++     }
+++    // end::return[]
++   }
++   // end::register[]
++ 
+diff --git a/package-lock.json b/package-lock.json
+index f5ad303..57a3880 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -15,7 +15,15 @@
+         "express": "^4.17.1",
+         "express-session": "^1.17.3",
+         "jsonwebtoken": "^8.5.1",
++<<<<<<< HEAD
++<<<<<<< HEAD
+         "neo4j-driver": "^4.4.10",
++=======
++        "neo4j-driver": "^5.1.0",
++>>>>>>> 8c8bfba (Use 5.0 drivers)
++=======
++        "neo4j-driver": "^4.4.10",
++>>>>>>> ce13aea (Completed challenge: Adding the Driver.  Imported neo4j dependency and initialized driver variable.)
+         "passport": "^0.6.0",
+         "passport-anonymous": "^1.0.1",
+         "passport-jwt": "^4.0.0",
+diff --git a/src/services/auth.service.js b/src/services/auth.service.js
+index a97e266..874f4e9 100644
+--- a/src/services/auth.service.js
++++ b/src/services/auth.service.js
+@@ -40,53 +40,66 @@ export default class AuthService {
+   async register(email, plainPassword, name) {
+     const encrypted = await hash(plainPassword, parseInt(SALT_ROUNDS))
+ 
+-    // tag::constraintError[]
+-    // TODO: Handle Unique constraints in the database
+-    if (email !== 'graphacademy@neo4j.com') {
+-      throw new ValidationError(`An account already exists with the email address ${email}`, {
+-        email: 'Email address taken'
+-      })
+-    }
+-    // end::constraintError[]
+-
+     // Open a new session
+     const session = this.driver.session()
+ 
+-    // tag::create[]
+-    // Create the User node in a write transaction
+-    const res = await session.executeWrite(
+-      tx => tx.run(
+-        `
+-          CREATE (u:User {
+-            userId: randomUuid(),
+-            email: $email,
+-            password: $encrypted,
+-            name: $name
+-          })
+-          RETURN u
+-        `,
+-        { email, encrypted, name }
++    // tag::catch[]
++    try {
++      // tag::create[]
++      // Create the User node in a write transaction
++      const res = await session.executeWrite(
++        tx => tx.run(
++          `
++            CREATE (u:User {
++              userId: randomUuid(),
++              email: $email,
++              password: $encrypted,
++              name: $name
++            })
++            RETURN u
++          `,
++          { email, encrypted, name }
++        )
+       )
+-    )
+-    // end::create[]
++      // end::create[]
+ 
+-    // tag::extract[]
+-    // Extract the user from the result
+-    const [ first ] = res.records
+-    const node = first.get('u')
++      // tag::extract[]
++      // Extract the user from the result
++      const [ first ] = res.records
++      const node = first.get('u')
+ 
+-    const { password, ...safeProperties } = node.properties
+-    // end::extract[]
++      const { password, ...safeProperties } = node.properties
++      // end::extract[]
+ 
+-    // Close the session
+-    await session.close()
++      // Close the session
++      await session.close()
+ 
+-    // tag::return[]
+-    return {
+-      ...safeProperties,
+-      token: jwt.sign(this.userToClaims(safeProperties), JWT_SECRET),
++      // tag::return[]
++      return {
++        ...safeProperties,
++        token: jwt.sign(this.userToClaims(safeProperties), JWT_SECRET),
++      }
++      // end::return[]
++    }
++    catch (e) {
++      // Handle unique constraints in the database
++      if (e.code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
++        throw new ValidationError(
++          `An account already exists with the email address ${email}`,
++          {
++            email: 'Email address already taken'
++          }
++        )
++      }
++
++      // Non-neo4j error
++      throw e
++    }
++    finally {
++      // Close the session
++      await session.close()
+     }
+-    // end::return[]
++    // end::catch[]
+   }
+   // end::register[]
+ 
+diff --git a/src/services/movie.service.js b/src/services/movie.service.js
+index 057bfdb..99f4f4e 100644
+--- a/src/services/movie.service.js
++++ b/src/services/movie.service.js
+@@ -2,6 +2,7 @@ import { goodfellas, popular } from '../../test/fixtures/movies.js'
+ import { roles } from '../../test/fixtures/people.js'
+ import { toNativeTypes } from '../utils.js'
+ import NotFoundError from '../errors/not-found.error.js'
++import { int } from 'neo4j-driver'
+ 
+ // Import the `int` function from neo4j-driver
+ import { int } from 'neo4j-driver'
+@@ -43,7 +44,6 @@ export default class MovieService {
+     // Open an Session
+     const session = this.driver.session()
+ 
+-    // tag::allcypher[]
+     // Execute a query in a new Read Transaction
+     const res = await session.executeRead(
+       tx => tx.run(
+@@ -56,23 +56,18 @@ export default class MovieService {
+           ORDER BY m.\`${sort}\` ${order}
+           SKIP $skip
+           LIMIT $limit
+-        `, { skip: int(skip), limit: int(limit) })
++        `,
++        { skip: int(skip), limit: int(limit) }
++      )
+     )
+-    // end::allcypher[]
+ 
+-    // tag::allmovies[]
+     // Get a list of Movies from the Result
+-    const movies = res.records.map(
+-      row => toNativeTypes(row.get('movie'))
+-    )
+-    // end::allmovies[]
++    const movies = res.records.map(row => toNativeTypes(row.get('movie')))
+ 
+     // Close the session
+     await session.close()
+ 
+-    // tag::return[]
+     return movies
+-    // end::return[]
+   }
+   // end::all[]
+ 

@@ -1,0 +1,131 @@
+diff --git a/package-lock.json b/package-lock.json
+index 57a3880..3f9afa7 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -17,7 +17,15 @@
+         "jsonwebtoken": "^8.5.1",
+ <<<<<<< HEAD
+ <<<<<<< HEAD
++<<<<<<< HEAD
++<<<<<<< HEAD
++        "neo4j-driver": "^4.4.10",
++=======
++        "neo4j-driver": "^5.1.0",
++>>>>>>> 8c8bfba (Use 5.0 drivers)
++=======
+         "neo4j-driver": "^4.4.10",
++>>>>>>> ce13aea (Completed challenge: Adding the Driver.  Imported neo4j dependency and initialized driver variable.)
+ =======
+         "neo4j-driver": "^5.1.0",
+ >>>>>>> 8c8bfba (Use 5.0 drivers)
+diff --git a/src/services/auth.service.js b/src/services/auth.service.js
+index 874f4e9..41ce340 100644
+--- a/src/services/auth.service.js
++++ b/src/services/auth.service.js
+@@ -125,17 +125,50 @@ export default class AuthService {
+    */
+   // tag::authenticate[]
+   async authenticate(email, unencryptedPassword) {
+-    // TODO: Authenticate the user from the database
+-    if (email === 'graphacademy@neo4j.com' && unencryptedPassword === 'letmein') {
+-      const { password, ...claims } = user.properties
++    // Open a new session
++    const session = this.driver.session()
+ 
+-      return {
+-        ...claims,
+-        token: jwt.sign(claims, JWT_SECRET)
+-      }
++    // tag::query[]
++    // Find the user node within a Read Transaction
++    const res = await session.executeRead(
++      tx => tx.run(
++        'MATCH (u:User {email: $email}) RETURN u',
++        { email }
++      )
++    )
++    // end::query[]
++
++    // Close the session
++    await session.close()
++
++    // tag::norecords[]
++    // Verify the user exists
++    if ( res.records.length === 0 ) {
++      return false
+     }
++    // end::norecords[]
+ 
+-    return false
++    // tag::password[]
++    // Compare Passwords
++    const user = res.records[0].get('u')
++    const encryptedPassword = user.properties.password
++
++    const correct = await compare(unencryptedPassword, encryptedPassword)
++
++    if ( correct === false ) {
++      return false
++    }
++    // end::password[]
++
++    // tag::extractreturn[]
++    // Return User Details
++    const { password, ...safeProperties } = user.properties
++
++    return {
++      ...safeProperties,
++      token: jwt.sign(this.userToClaims(safeProperties), JWT_SECRET),
++    }
++    // end::extract[]
+   }
+   // end::authenticate[]
+ 
+diff --git a/src/services/movie.service.js b/src/services/movie.service.js
+index 99f4f4e..057bfdb 100644
+--- a/src/services/movie.service.js
++++ b/src/services/movie.service.js
+@@ -2,7 +2,6 @@ import { goodfellas, popular } from '../../test/fixtures/movies.js'
+ import { roles } from '../../test/fixtures/people.js'
+ import { toNativeTypes } from '../utils.js'
+ import NotFoundError from '../errors/not-found.error.js'
+-import { int } from 'neo4j-driver'
+ 
+ // Import the `int` function from neo4j-driver
+ import { int } from 'neo4j-driver'
+@@ -44,6 +43,7 @@ export default class MovieService {
+     // Open an Session
+     const session = this.driver.session()
+ 
++    // tag::allcypher[]
+     // Execute a query in a new Read Transaction
+     const res = await session.executeRead(
+       tx => tx.run(
+@@ -56,18 +56,23 @@ export default class MovieService {
+           ORDER BY m.\`${sort}\` ${order}
+           SKIP $skip
+           LIMIT $limit
+-        `,
+-        { skip: int(skip), limit: int(limit) }
+-      )
++        `, { skip: int(skip), limit: int(limit) })
+     )
++    // end::allcypher[]
+ 
++    // tag::allmovies[]
+     // Get a list of Movies from the Result
+-    const movies = res.records.map(row => toNativeTypes(row.get('movie')))
++    const movies = res.records.map(
++      row => toNativeTypes(row.get('movie'))
++    )
++    // end::allmovies[]
+ 
+     // Close the session
+     await session.close()
+ 
++    // tag::return[]
+     return movies
++    // end::return[]
+   }
+   // end::all[]
+ 

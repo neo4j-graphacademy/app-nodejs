@@ -1,0 +1,87 @@
+diff --git a/src/services/movie.service.js b/src/services/movie.service.js
+index 057bfdb..d65ca23 100644
+--- a/src/services/movie.service.js
++++ b/src/services/movie.service.js
+@@ -46,17 +46,22 @@ export default class MovieService {
+     // tag::allcypher[]
+     // Execute a query in a new Read Transaction
+     const res = await session.executeRead(
+-      tx => tx.run(
+-        `
+-          MATCH (m:Movie)
+-          WHERE m.\`${sort}\` IS NOT NULL
+-          RETURN m {
+-            .*
+-          } AS movie
+-          ORDER BY m.\`${sort}\` ${order}
+-          SKIP $skip
+-          LIMIT $limit
+-        `, { skip: int(skip), limit: int(limit) })
++      async tx => {
++        const favorites = await this.getUserFavorites(tx, userId)
++
++        return tx.run(
++          `
++            MATCH (m:Movie)
++            WHERE m.\`${sort}\` IS NOT NULL
++            RETURN m {
++              .*,
++              favorite: m.tmdbId IN $favorites
++            } AS movie
++            ORDER BY m.\`${sort}\` ${order}
++            SKIP $skip
++            LIMIT $limit
++          `, { skip: int(skip), limit: int(limit), favorites })
++      }
+     )
+     // end::allcypher[]
+ 
+@@ -231,7 +236,23 @@ export default class MovieService {
+    */
+   // tag::getUserFavorites[]
+   async getUserFavorites(tx, userId) {
+-    return []
++    // If userId is not defined, return an empty array
++    if ( userId === undefined ) {
++      return []
++    }
++
++    const favoriteResult = await tx.run(
++      `
++        MATCH (:User {userId: $userId})-[:HAS_FAVORITE]->(m)
++        RETURN m.tmdbId AS id
++      `,
++      { userId, }
++    )
++
++    // Extract the `id` value returned by the cypher query
++    return favoriteResult.records.map(
++      row => row.get('id')
++    )
+   }
+   // end::getUserFavorites[]
+ 
+diff --git a/src/services/rating.service.js b/src/services/rating.service.js
+index 2adb82f..8c481ab 100644
+--- a/src/services/rating.service.js
++++ b/src/services/rating.service.js
+@@ -60,7 +60,6 @@ export default class ReviewService {
+    */
+   // tag::add[]
+   async add(userId, movieId, rating) {
+-<<<<<<< HEAD
+     // tag::convert[]
+     // Convert the native integer into a Neo4j Integer
+     rating = int(rating)
+@@ -69,11 +68,6 @@ export default class ReviewService {
+     // tag::write[]
+     // Save the rating to the database
+ 
+-=======
+-    // Convert the native integer into a Neo4j Integer
+-    rating = int(rating)
+-
+->>>>>>> c4b72e6 (Completed challenge: Rating Movies. Create a (:User)-[:RATED]->(:Movie) relationship with a .rating property)
+     // Open a new session
+     const session = this.driver.session()
+ 
