@@ -65,7 +65,7 @@ const asyncFunction = async () => {
   }
   finally {
     // Finally, close the session
-    return session.close()
+    await session.close()
   }
   // end::catch[]
 }
