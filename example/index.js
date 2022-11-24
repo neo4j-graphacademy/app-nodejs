@@ -72,7 +72,7 @@ class MyService {
     this.driver = driver
   }
 
-  method() {
+  async method() {
     // tag::session[]
     // Open a new session
     const session = this.driver.session()
@@ -155,8 +155,6 @@ const executeWrite = async () => {
 }
 
 const manualTransaction = async () => {
-  const session = this.driver.session()
-
   // tag::session.beginTransaction[]
   // Open a new session
   const session = driver.session({
@@ -173,18 +171,21 @@ const manualTransaction = async () => {
   // tag::session.beginTransaction.Try[]
   try {
     // Perform an action
-    tx.run(query, params)
+    await tx.run(query, params)
 
     // Commit the transaction
-    tx.commit()
+    await tx.commit()
   }
   catch (e) {
     // If something went wrong, rollback the transaction
-    tx.rollback()
+    await tx.rollback()
+  }
+  finally {
+    // Finally, close the session
+    await session.close()
   }
   // end::session.beginTransaction.Try[]
 
-  await session.close()
 }
 
 /**

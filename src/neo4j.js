@@ -46,7 +46,9 @@ export function getDriver() {
  * @returns {void}
  */
 // tag::closeDriver[]
-export function closeDriver() {
-  return driver && driver.close()
+export async function closeDriver() {
+  if (driver) {
+    await driver.close()
+  }
 }
 // end::closeDriver[]

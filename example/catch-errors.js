@@ -30,7 +30,7 @@ const promiseApi = () => {
     })
     .finally(() => {
       // Finally, close the session
-      session.close()
+      return session.close()
     })
     // end::promise[]
 }
@@ -65,10 +65,9 @@ const asyncFunction = async () => {
   }
   finally {
     // Finally, close the session
-    session.close()
+    return session.close()
   }
   // end::catch[]
-
 }
 
 asyncFunction()

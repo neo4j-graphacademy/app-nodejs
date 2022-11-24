@@ -35,7 +35,7 @@ const main = async () => {
 
   // Working with node objects
   // tag::node[]
-  person.identity // (1)
+  person.elementId // (1)
   person.labels // (2)
   person.properties // (3)
   // end::node[]
@@ -45,11 +45,11 @@ const main = async () => {
   // tag::rel[]
   const actedIn = row.get('actedIn')
 
-  actedIn.identity // (1)
+  actedIn.elementId // (1)
   actedIn.type // (2)
   actedIn.properties // (3)
-  actedIn.start // (4)
-  actedIn.end // (5)
+  actedIn.startNodeElementId // (4)
+  actedIn.endNodeElementId // (5)
   // end::rel[]
 
   // Working with Paths

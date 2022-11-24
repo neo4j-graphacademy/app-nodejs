@@ -29,6 +29,8 @@ const promiseApiExample = () => {
       // database connection or the query
       console.log(e)
     })
+    // Finally, close the session
+    .finally(() => session.close())
     // end::promises[]
 }
 
@@ -59,17 +61,49 @@ const asyncAwaitExample = async () => {
     // database connection or the query
     console.log(e)
   }
+  finally {
+    await session.close()
+  }
   // end::async[]
+}
 
+const iterateExample = async () => {
+  const session = driver.session()
 
-  await session.close()
+  try {
+    const res = await session.executeRead(tx =>
+      tx.run(
+        'MATCH (p:Person) RETURN p.name AS name LIMIT 10'
+      )
+    )
+
+    // tag::iterate[]
+    for (const record in res.records) {
+      console.log(row.get('name'))
+    }
+    const names = res.records.map(row => {
+      return
+    })
+    // end::iterate[]
+
+    // `names` is an array of strings
+    console.log(names)
+  }
+  catch (e) {
+    // There was a problem with the
+    // database connection or the query
+    console.log(e)
+  }
+  finally {
+    await session.close()
+  }
 }
 
 const rxExample = async () => {
   const rxSession = driver.rxSession()
 
   // tag::rxjs[]
-  rxSession
+  const res = await rxSession
     .executeWrite(txc =>
       txc
         .run('MERGE (p:Person) RETURN p.name AS name LIMIT 10')
@@ -79,6 +113,10 @@ const rxExample = async () => {
         )
     )
     // end::rxjs[]
+
+    console.log(res)
+
+    await rxSession.close()
 }
 
 const subscribe = () => {
