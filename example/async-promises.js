@@ -79,11 +79,8 @@ const iterateExample = async () => {
 
     // tag::iterate[]
     for (const record in res.records) {
-      console.log(row.get('name'))
+      console.log(record.get('name'))
     }
-    const names = res.records.map(row => {
-      return
-    })
     // end::iterate[]
 
     // `names` is an array of strings
