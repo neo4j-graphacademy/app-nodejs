@@ -1,7 +1,6 @@
 import path from 'path'
 import express from 'express'
 import cors from 'cors'
-import bodyParser from 'body-parser'
 import session from 'express-session'
 import routes from './routes/index.js'
 import errorMiddleware from './middleware/error.middleware.js'
@@ -22,7 +21,7 @@ app.use(session({
   saveUninitialized: true,
 }))
 app.use(cors())
-app.use(bodyParser.json())
+app.use(express.json())
 
 // Connect to Neo4j and Verify Connectivity
 initDriver(NEO4J_URI, NEO4J_USERNAME, NEO4J_PASSWORD)
