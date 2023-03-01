@@ -1,0 +1,3 @@
+[submodule "neoflix-cypher"]
+	path = neoflix-cypher
+	url = https://github.com/neo4j-graphacademy/neoflix-cypher.git

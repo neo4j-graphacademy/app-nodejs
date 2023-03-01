@@ -1,0 +1,42 @@
+diff --git a/src/services/genre.service.js b/src/services/genre.service.js
+index 8f22391..4f7c6f8 100644
+--- a/src/services/genre.service.js
++++ b/src/services/genre.service.js
+@@ -37,11 +37,33 @@ export default class GenreService {
+    */
+   // tag::all[]
+   async all() {
+-    // TODO: Open a new session
+-    // TODO: Get a list of Genres from the database
+-    // TODO: Close the session
++    // Open a new Session
++    const session = this.driver.session()
++
++    // Get a list of Genres from the database
++    const res = await session.executeRead(tx => tx.run(`
++      MATCH (g:Genre)
++      WHERE g.name <> '(no genres listed)'
++      CALL {
++        WITH g
++        MATCH (g)<-[:IN_GENRE]-(m:Movie)
++        WHERE m.imdbRating IS NOT NULL
++        AND m.poster IS NOT NULL
++        RETURN m.poster AS poster
++        ORDER BY m.imdbRating DESC LIMIT 1
++      }
++      RETURN g {
++        .*,
++        poster: poster
++      } as genre
++      ORDER BY g.name ASC
++    `))
++
++    // Close the session
++    await session.close()
+ 
+-    return genres
++    // Return results
++    return res.records.map(row => toNativeTypes(row.get('genre')))
+   }
+   // end::all[]
+ 

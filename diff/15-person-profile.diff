@@ -1,0 +1,92 @@
+diff --git a/src/services/people.service.js b/src/services/people.service.js
+index 586a765..ac6137c 100644
+--- a/src/services/people.service.js
++++ b/src/services/people.service.js
+@@ -72,9 +72,26 @@ export default class PeopleService {
+    */
+   // tag::findById[]
+   async findById(id) {
+-    // TODO: Find a user by their ID
++    // Open a new database session
++    const session = this.driver.session()
++
++    // Get a list of people from the database
++    const res = await session.executeRead(
++      tx => tx.run(`
++        MATCH (p:Person {tmdbId: $id})
++        RETURN p {
++          .*,
++          actedCount: size((p)-[:ACTED_IN]->()),
++          directedCount: size((p)-[:DIRECTED]->())
++        } AS person
++      `, { id })
++    )
++
++    // Close the session
++    await session.close()
+ 
+-    return pacino
++    const [row] = res.records
++    return toNativeTypes(row.get('person'))
+   }
+   // end::findById[]
+ 
+diff --git a/src/services/rating.service.js b/src/services/rating.service.js
+index 8de278b..406bc33 100644
+--- a/src/services/rating.service.js
++++ b/src/services/rating.service.js
+@@ -81,6 +81,7 @@ export default class ReviewService {
+    */
+   // tag::add[]
+   async add(userId, movieId, rating) {
++<<<<<<< HEAD
+ <<<<<<< HEAD
+     // tag::convert[]
+     // Convert the native integer into a Neo4j Integer
+@@ -172,6 +173,46 @@ export default class ReviewService {
+ 
+     return toNativeTypes(movie)
+ >>>>>>> c4b72e6 (Completed challenge: Rating Movies. Create a (:User)-[:RATED]->(:Movie) relationship with a .rating property)
++=======
++    // Convert the native integer into a Neo4j Integer
++    rating = int(rating)
++
++    // Open a new session
++    const session = this.driver.session()
++
++    // Save the rating in the database
++    const res = await session.executeWrite(
++      tx => tx.run(
++        `
++          MATCH (u:User {userId: $userId})
++          MATCH (m:Movie {tmdbId: $movieId})
++
++          MERGE (u)-[r:RATED]->(m)
++          SET r.rating = $rating,
++              r.timestamp = timestamp()
++
++          RETURN m {
++            .*,
++            rating: r.rating
++          } AS movie
++        `,
++        { userId, movieId, rating, }
++      )
++    )
++
++    // Check User and Movie exist
++    if ( res.records.length === 0 ) {
++      throw new NotFoundError(
++        `Could not create rating for Movie ${movieId} by User ${userId}`
++      )
++    }
++
++    // Return movie details and rating
++    const [ first ] = res.records
++    const movie = first.get('movie')
++
++    return toNativeTypes(movie)
++>>>>>>> c4b72e6 (Completed challenge: Rating Movies. Create a (:User)-[:RATED]->(:Movie) relationship with a .rating property)
+   }
+   // end::add[]
+ 
