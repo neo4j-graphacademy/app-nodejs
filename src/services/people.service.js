@@ -1,6 +1,7 @@
 import NotFoundError from '../errors/not-found.error.js'
 import { pacino, people } from '../../test/fixtures/people.js'
 import { toNativeTypes } from '../utils.js'
+import { int } from 'neo4j-driver'
 
 // TODO: Import the `int` function from neo4j-driver
 
@@ -38,9 +39,25 @@ export default class PeopleService {
    */
   // tag::all[]
   async all(q, sort = 'name', order = 'ASC', limit = 6, skip = 0) {
-    // TODO: Get a list of people from the database
+    // Open a new database session
+    const session = this.driver.session()
 
-    return people.slice(skip, skip + limit)
+    // Get a list of people from the database
+    const res = await session.executeRead(
+      tx => tx.run(`
+        MATCH (p:Person)
+        ${q !== undefined ? 'WHERE p.name CONTAINS $q' : ''}
+        RETURN p { .* } AS person
+        ORDER BY p.${sort} ${order}
+        SKIP $skip
+        LIMIT $limit
+      `, { q, skip: int(skip), limit: int(limit) })
+    )
+
+    // Close the session
+    await session.close()
+
+    return res.records.map(row => toNativeTypes(row.get('person')))
   }
   // end::all[]
 
