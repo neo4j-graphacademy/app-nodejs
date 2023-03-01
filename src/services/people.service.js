@@ -72,9 +72,26 @@ export default class PeopleService {
    */
   // tag::findById[]
   async findById(id) {
-    // TODO: Find a user by their ID
+    // Open a new database session
+    const session = this.driver.session()
 
-    return pacino
+    // Get a list of people from the database
+    const res = await session.executeRead(
+      tx => tx.run(`
+        MATCH (p:Person {tmdbId: $id})
+        RETURN p {
+          .*,
+          actedCount: size((p)-[:ACTED_IN]->()),
+          directedCount: size((p)-[:DIRECTED]->())
+        } AS person
+      `, { id })
+    )
+
+    // Close the session
+    await session.close()
+
+    const [row] = res.records
+    return toNativeTypes(row.get('person'))
   }
   // end::findById[]
 
