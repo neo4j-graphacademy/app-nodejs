@@ -1,5 +1,5 @@
 diff --git a/src/services/movie.service.js b/src/services/movie.service.js
-index 057bfdb..d65ca23 100644
+index afe4678..e303981 100644
 --- a/src/services/movie.service.js
 +++ b/src/services/movie.service.js
 @@ -46,17 +46,22 @@ export default class MovieService {
@@ -35,7 +35,7 @@ index 057bfdb..d65ca23 100644
 +      }
      )
      // end::allcypher[]
-
+ 
 @@ -231,7 +236,23 @@ export default class MovieService {
     */
    // tag::getUserFavorites[]
@@ -60,3 +60,4 @@ index 057bfdb..d65ca23 100644
 +    )
    }
    // end::getUserFavorites[]
+ 
