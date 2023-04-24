@@ -96,7 +96,7 @@ index e4370df..e69de29 100644
 -   // end::add[]
 -
 diff --git a/src/services/people.service.js b/src/services/people.service.js
-index 586a765..e7c6032 100644
+index 586a765..727b399 100644
 --- a/src/services/people.service.js
 +++ b/src/services/people.service.js
 @@ -72,9 +72,26 @@ export default class PeopleService {
@@ -113,8 +113,8 @@ index 586a765..e7c6032 100644
 +        MATCH (p:Person {tmdbId: $id})
 +        RETURN p {
 +          .*,
-+          actedCount: size((p)-[:ACTED_IN]->()),
-+          directedCount: size((p)-[:DIRECTED]->())
++          actedCount: count { (p)-[:ACTED_IN]->() },
++          directedCount: count { (p)-[:DIRECTED]->() }
 +        } AS person
 +      `, { id })
 +    )
