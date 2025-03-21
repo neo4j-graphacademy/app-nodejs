@@ -49,7 +49,7 @@ index e4370df..e69de29 100644
 -     // tag::convert[]
 -     // Convert the native integer into a Neo4j Integer
 -@@ -172,6 +173,46 @@ export default class ReviewService {
-- 
+-
 -     return toNativeTypes(movie)
 - >>>>>>> c4b72e6 (Completed challenge: Rating Movies. Create a (:User)-[:RATED]->(:Movie) relationship with a .rating property)
 -+=======
