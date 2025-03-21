@@ -5,7 +5,7 @@ index a97e266..874f4e9 100644
 @@ -40,53 +40,66 @@ export default class AuthService {
    async register(email, plainPassword, name) {
      const encrypted = await hash(plainPassword, parseInt(SALT_ROUNDS))
-
+ 
 -    // tag::constraintError[]
 -    // TODO: Handle Unique constraints in the database
 -    if (email !== 'graphacademy@neo4j.com') {
@@ -17,7 +17,7 @@ index a97e266..874f4e9 100644
 -
      // Open a new session
      const session = this.driver.session()
-
+ 
 -    // tag::create[]
 -    // Create the User node in a write transaction
 -    const res = await session.executeWrite(
@@ -53,7 +53,7 @@ index a97e266..874f4e9 100644
 -    )
 -    // end::create[]
 +      // end::create[]
-
+ 
 -    // tag::extract[]
 -    // Extract the user from the result
 -    const [ first ] = res.records
@@ -62,17 +62,17 @@ index a97e266..874f4e9 100644
 +      // Extract the user from the result
 +      const [ first ] = res.records
 +      const node = first.get('u')
-
+ 
 -    const { password, ...safeProperties } = node.properties
 -    // end::extract[]
 +      const { password, ...safeProperties } = node.properties
 +      // end::extract[]
-
+ 
 -    // Close the session
 -    await session.close()
 +      // Close the session
 +      await session.close()
-
+ 
 -    // tag::return[]
 -    return {
 -      ...safeProperties,
@@ -106,3 +106,4 @@ index a97e266..874f4e9 100644
 +    // end::catch[]
    }
    // end::register[]
+ 
