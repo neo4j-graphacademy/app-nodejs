@@ -29,13 +29,13 @@ index e4370df..e69de29 100644
 -+
 -+    // Close the session
 -+    await session.close()
--
+- 
 --    return pacino
 -+    const [row] = res.records
 -+    return toNativeTypes(row.get('person'))
 -   }
 -   // end::findById[]
--
+- 
 -diff --git a/src/services/rating.service.js b/src/services/rating.service.js
 -index 8de278b..406bc33 100644
 ---- a/src/services/rating.service.js
@@ -94,7 +94,7 @@ index e4370df..e69de29 100644
 -+>>>>>>> c4b72e6 (Completed challenge: Rating Movies. Create a (:User)-[:RATED]->(:Movie) relationship with a .rating property)
 -   }
 -   // end::add[]
--
+- 
 diff --git a/src/services/people.service.js b/src/services/people.service.js
 index 586a765..727b399 100644
 --- a/src/services/people.service.js
@@ -127,7 +127,7 @@ index 586a765..727b399 100644
 +    return toNativeTypes(row.get('person'))
    }
    // end::findById[]
-
+ 
 @@ -90,9 +107,28 @@ export default class PeopleService {
     */
    // tag::getSimilarPeople[]
@@ -151,7 +151,7 @@ index 586a765..727b399 100644
 +        LIMIT $limit
 +      `, { id, limit: int(limit), skip: int(skip) })
 +    )
-
+ 
 -    return people.slice(skip, skip + limit)
 +    await session.close()
 +
