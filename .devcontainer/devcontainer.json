@@ -1,0 +1,19 @@
+{
+	"name": "Building Neo4j Applications with Node.js",
+	"image": "mcr.microsoft.com/devcontainers/javascript-node",
+	"postCreateCommand": "bash .devcontainer/post_create.sh",
+	"customizations": {
+		"codespaces": {
+			"openFiles": [
+				"SETUP.md",
+				".env.example",
+				"src/neo4j.js"
+				]
+		},
+		"vscode": {
+			"extensions": [
+				"formulahendry.code-runner"
+				]
+		}
+	}
+}
