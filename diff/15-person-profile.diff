@@ -121,7 +121,7 @@ index 586a765..727b399 100644
 +
 +    // Close the session
 +    await session.close()
- 
+
 -    return pacino
 +    const [row] = res.records
 +    return toNativeTypes(row.get('person'))
@@ -158,4 +158,3 @@ index 586a765..727b399 100644
 +    return res.records.map(row => toNativeTypes(row.get('person')))
    }
    // end::getSimilarPeople[]
- 
