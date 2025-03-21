@@ -5,11 +5,11 @@ index 2c20d6e..a97e266 100644
 @@ -49,14 +49,44 @@ export default class AuthService {
      }
      // end::constraintError[]
-
+ 
 -    // TODO: Save user
 +    // Open a new session
 +    const session = this.driver.session()
-
+ 
 -    const { password, ...safeProperties } = user
 +    // tag::create[]
 +    // Create the User node in a write transaction
@@ -28,7 +28,7 @@ index 2c20d6e..a97e266 100644
 +      )
 +    )
 +    // end::create[]
-
+ 
 +    // tag::extract[]
 +    // Extract the user from the result
 +    const [ first ] = res.records
@@ -48,3 +48,4 @@ index 2c20d6e..a97e266 100644
 +    // end::return[]
    }
    // end::register[]
+ 
