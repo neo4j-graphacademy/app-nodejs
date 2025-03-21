@@ -1,19 +1,16 @@
 diff --git a/src/services/movie.service.js b/src/services/movie.service.js
-index a9b3ff6..057bfdb 100644
+index 55443fc..afe4678 100644
 --- a/src/services/movie.service.js
 +++ b/src/services/movie.service.js
-@@ -2,9 +2,9 @@ import { goodfellas, popular } from '../../test/fixtures/movies.js'
- import { roles } from '../../test/fixtures/people.js'
- import { toNativeTypes } from '../utils.js'
+@@ -4,6 +4,7 @@ import { toNativeTypes } from '../utils.js'
  import NotFoundError from '../errors/not-found.error.js'
 
--// TODO: Import the `int` function from neo4j-driver
-+// Import the `int` function from neo4j-driver
+ // TODO: Import the `int` function from neo4j-driver
 +import { int } from 'neo4j-driver'
 
  export default class MovieService {
    /**
-@@ -40,12 +40,39 @@ export default class MovieService {
+@@ -39,12 +40,39 @@ export default class MovieService {
     */
    // tag::all[]
    async all(sort = 'title', order = 'ASC', limit = 6, skip = 0, userId = undefined) {

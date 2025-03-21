@@ -1,19 +1,16 @@
 diff --git a/src/services/favorite.service.js b/src/services/favorite.service.js
-index 18e8cfb..6ec0849 100644
+index 18e8cfb..66efe81 100644
 --- a/src/services/favorite.service.js
 +++ b/src/services/favorite.service.js
-@@ -1,9 +1,6 @@
- import NotFoundError from '../errors/not-found.error.js'
+@@ -2,6 +2,7 @@ import NotFoundError from '../errors/not-found.error.js'
  import { toNativeTypes } from '../utils.js'
--
--// TODO: Import the `int` function from neo4j-driver
--
--import { goodfellas, popular } from '../../test/fixtures/movies.js'
+ 
+ // TODO: Import the `int` function from neo4j-driver
 +import { int } from 'neo4j-driver'
-
- export default class FavoriteService {
-   /**
-@@ -40,11 +37,30 @@ export default class FavoriteService {
+ 
+ import { goodfellas, popular } from '../../test/fixtures/movies.js'
+ 
+@@ -40,11 +41,30 @@ export default class FavoriteService {
     */
    // tag::all[]
    async all(userId, sort = 'title', order = 'ASC', limit = 6, skip = 0) {
@@ -22,7 +19,8 @@ index 18e8cfb..6ec0849 100644
 -    // TODO: Close session
 +    // Open a new session
 +    const session = await this.driver.session()
-+
+ 
+-    return popular
 +    // Retrieve a list of movies favorited by the user
 +    const res = await session.executeRead(
 +      tx => tx.run(
@@ -39,16 +37,15 @@ index 18e8cfb..6ec0849 100644
 +        { userId, skip: int(skip), limit: int(limit) }
 +      )
 +    )
-
--    return popular
++
 +    // Close session
 +    await session.close()
 +
 +    return res.records.map(row => toNativeTypes(row.get('movie')))
    }
    // end::all[]
-
-@@ -61,15 +77,49 @@ export default class FavoriteService {
+ 
+@@ -61,15 +81,47 @@ export default class FavoriteService {
     */
    // tag::add[]
    async add(userId, movieId) {
@@ -70,10 +67,8 @@ index 18e8cfb..6ec0849 100644
 +        `
 +          MATCH (u:User {userId: $userId})
 +          MATCH (m:Movie {tmdbId: $movieId})
-+
 +          MERGE (u)-[r:HAS_FAVORITE]->(m)
 +          ON CREATE SET u.createdAt = datetime()
-+
 +          RETURN m {
 +            .*,
 +            favorite: true
@@ -105,8 +100,8 @@ index 18e8cfb..6ec0849 100644
 +    // end::return[]
    }
    // end::add[]
-
-@@ -87,15 +137,41 @@ export default class FavoriteService {
+ 
+@@ -87,15 +139,39 @@ export default class FavoriteService {
     */
    // tag::remove[]
    async remove(userId, movieId) {
@@ -126,9 +121,7 @@ index 18e8cfb..6ec0849 100644
 +      tx => tx.run(
 +        `
 +          MATCH (u:User {userId: $userId})-[r:HAS_FAVORITE]->(m:Movie {tmdbId: $movieId})
-+
 +          DELETE r
-+
 +          RETURN m {
 +            .*,
 +            favorite: false
@@ -155,3 +148,4 @@ index 18e8cfb..6ec0849 100644
 +    return toNativeTypes(movie)
    }
    // end::remove[]
+ 
