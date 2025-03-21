@@ -94,7 +94,7 @@ export default class GenreService {
       RETURN g {
         link: '/genres/'+ g.name,
         .name,
-        movies: size((g)<-[:IN_GENRE]-()),
+        movies: count{(g)<-[:IN_GENRE]-()},
         poster: movie.poster
       } AS genre
     `, { name }))
