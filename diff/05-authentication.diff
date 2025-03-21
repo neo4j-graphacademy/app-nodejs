@@ -11,7 +11,7 @@ index 874f4e9..41ce340 100644
 -      const { password, ...claims } = user.properties
 +    // Open a new session
 +    const session = this.driver.session()
-
+ 
 -      return {
 -        ...claims,
 -        token: jwt.sign(claims, JWT_SECRET)
@@ -35,7 +35,7 @@ index 874f4e9..41ce340 100644
 +      return false
      }
 +    // end::norecords[]
-
+ 
 -    return false
 +    // tag::password[]
 +    // Compare Passwords
@@ -60,3 +60,4 @@ index 874f4e9..41ce340 100644
 +    // end::extract[]
    }
    // end::authenticate[]
+ 
