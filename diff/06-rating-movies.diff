@@ -1,15 +1,16 @@
 diff --git a/src/services/rating.service.js b/src/services/rating.service.js
-index 06a3610..8c481ab 100644
+index 06a3610..9b38947 100644
 --- a/src/services/rating.service.js
 +++ b/src/services/rating.service.js
-@@ -1,5 +1,6 @@
- import { goodfellas } from '../../test/fixtures/movies.js'
+@@ -2,6 +2,7 @@ import { goodfellas } from '../../test/fixtures/movies.js'
  import { ratings } from '../../test/fixtures/ratings.js'
-+import { int } from 'neo4j-driver'
  import NotFoundError from '../errors/not-found.error.js'
  import { toNativeTypes } from '../utils.js'
-
-@@ -59,11 +60,56 @@ export default class ReviewService {
++import { int } from 'neo4j-driver'
+ 
+ // TODO: Import the `int` function from neo4j-driver
+ 
+@@ -59,11 +60,54 @@ export default class ReviewService {
     */
    // tag::add[]
    async add(userId, movieId, rating) {
@@ -20,7 +21,7 @@ index 06a3610..8c481ab 100644
 +    // Convert the native integer into a Neo4j Integer
 +    rating = int(rating)
 +    // end::convert[]
-
+ 
 -    return goodfellas
 +    // tag::write[]
 +    // Save the rating to the database
@@ -34,11 +35,9 @@ index 06a3610..8c481ab 100644
 +        `
 +          MATCH (u:User {userId: $userId})
 +          MATCH (m:Movie {tmdbId: $movieId})
-+
 +          MERGE (u)-[r:RATED]->(m)
 +          SET r.rating = $rating,
 +              r.timestamp = timestamp()
-+
 +          RETURN m {
 +            .*,
 +            rating: r.rating
@@ -69,3 +68,4 @@ index 06a3610..8c481ab 100644
 +    // end::addreturn[]
    }
    // end::add[]
+ 
