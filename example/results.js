@@ -98,7 +98,7 @@ const main = async () => {
   console.log(isDate(createdAt)) // false
 
   // Convert a Neo4j DateTime back into a native Date
-  const dateNumber = Date.parse(driverDate.toString())
+  const dateNumber = Date.parse(createdAt.toString())
   const nativeDate = new Date(dateNumber)
   // end::temporal[]
 
